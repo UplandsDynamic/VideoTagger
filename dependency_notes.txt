@@ -1,0 +1,9 @@
+### Dependences
+
+# Arch repo
+- python-yaml
+- libyaml
+- mpv
+
+# GitHub
+- pythonmpv [git@github.com:ZWS2014/python-mpv.git]

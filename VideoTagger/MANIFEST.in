@@ -1,0 +1,4 @@
+## Extra includes
+include VideoTagger/VERSION.rst
+include README.rst
+recursive-include VideoTagger/resources *
