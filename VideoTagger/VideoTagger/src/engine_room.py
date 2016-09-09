@@ -31,16 +31,14 @@ class NoteMachine:
     def save_note(notes_dir, video_title, video_source, video_timestamp, note, save_type=SAVE_TYPE_YAML):
         if save_type is SAVE_TYPE_YAML:
             try:
-                with open('{}/{}_ts_{}.yaml'.format(notes_dir,
-                                                    title_formatter(video_title),
-                                                    video_timestamp), 'w+') as f:
+                with open('{}/{}.yaml'.format(notes_dir, title_formatter(video_title)), 'a') as f:
                     # write the file
-                    dump({'VideoTagger Data':
-                              [{'Timestamp': video_timestamp},
-                               {'Video Source': video_source},
-                               {'Video Title': title_formatter(video_title)},
-                               {'Note': '\n{}'.format(note)}, ]}, f,
-                         Dumper=Dumper, default_flow_style=False, explicit_start=True)
+                    dump([{'Data':
+                               [{'Timestamp': video_timestamp},
+                                {'Video Source': video_source},
+                                {'Video Title': title_formatter(video_title)},
+                                {'Note': '{}'.format(note)}, ]}], f,
+                         Dumper=Dumper, default_flow_style=False, explicit_start=False)
                 return True
             except Exception as e:
                 print('There was an error saving the note: {}'.format(e))
@@ -49,21 +47,17 @@ class NoteMachine:
         return False
 
     @staticmethod
-    def get_note(notes_dir, video_title, video_source, video_timestamp, save_type=SAVE_TYPE_YAML):
+    def get_note():
+        # ToDo ... retrieve notes for reader functionality ...
+        ''' EXAMPLE:
         if save_type is SAVE_TYPE_YAML:
             try:
-                # if note exists for exact dir/title/timestamp, simply return the data
-                with open('{}/{}_ts_{}.yaml'.format(notes_dir,
-                                                    title_formatter(video_title),
-                                                    video_timestamp), 'r') as f:
-                    # return ''.join(f.readline())
-                    return load(f, Loader=Loader)
+                with open('{}/{}.yaml'.format(notes_dir, title_formatter(video_title)), 'r') as f:
+                    data = load(f, Loader=Loader)
             except FileNotFoundError:
-                pass  # pass to return video values for new note creation
-        return {'Note': '[NOTE START] ',
-                'Timestamp': video_timestamp,
-                'Video Source': video_source,
-                'Video Title': title_formatter(video_title)}
+                pass  # do something if file not found
+        '''
+        pass
 
 
 ''' HELPERS '''

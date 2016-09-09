@@ -1,6 +1,7 @@
 import random
-import mpv
+import python_mpv_zws as mpv
 from . import engine_room
+
 
 class VideoPlayers:
     def __init__(self, treestore=None):
@@ -128,15 +129,13 @@ class VideoPlayer:
     def get_notes_dir(self):
         return self.notes_dir
 
-    def get_note(self):
-        note = engine_room.NoteMachine.get_note(
-            notes_dir=self.notes_dir,
-            video_title=self.video_players_group.treestore.get_value(
-                self.treestore_title_field, 1),
-            video_timestamp=self.mpv._get_property('time-pos'),
-            video_source=self.source,
-        )
-        return note or self.logger('error', 'note', 'There was an error opening the note file!')
+    def gen_note(self):
+        return {'Note': '',
+                'Timestamp': self.mpv._get_property('time-pos'),
+                'Video Source': self.source,
+                'Video Title': engine_room.title_formatter(self.video_players_group.treestore.get_value(
+                    self.treestore_title_field, 1))} or self.logger(
+            'error', 'note', 'There was an error opening the note file!')
 
     def play(self):
 

@@ -21,7 +21,7 @@ class Main:
     SEEK_FORWARD = 'Seek forward'
     TOGGLE_OSD = 'Toggles OSD on'
     TAKE_NOTE = 'Triggers note taking'
-    GET_NOTE = 'Gets currently set note for video'
+    GEN_NOTE = 'Generates note metadata'
     GET_PAUSE_BUTTON_STATE = 'Gets current pause state & sets button state'
     GET_NOTES_DIR = 'Gets the currently selected notes directory for the player'
     SET_NOTES_DIR = 'Callback to set the player notes directory'
@@ -183,10 +183,11 @@ class Main:
                 self.filechooser_dialog()
             notes_dir = self.player_interface(action=self.GET_NOTES_DIR)
             # get the existing note data
-            note_data = self.player_interface(action=self.GET_NOTE)  # dict returned
+            note_data = self.player_interface(action=self.GEN_NOTE)  # dict returned
             # set fields
             notes_dir_field.set_text(notes_dir)
             notes_video_title_field.set_text(note_data.get('Video Title') or '')
+            # note: below creates a new list to pop, therefore leaving original intact for later
             notes_video_source_field.set_text(note_data.get('Video Source') or '')
             timestamp_field.set_text(note_data.get('Timestamp') or '')
             note_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=7)
@@ -216,9 +217,9 @@ class Main:
             if response == Gtk.ResponseType.OK:
                 # save the note
                 start, end = note_tv_buff.get_bounds()
-                note = {'timestamp': timestamp_field.get_text(),
-                        'video_title': notes_video_title_field.get_text(),
-                        'video_source': notes_video_source_field.get_text(),
+                note = {'timestamp': note_data.get('Timestamp'),
+                        'video_title': note_data.get('Video Title'),
+                        'video_source': note_data.get('Video Source'),
                         'note_data': note_tv_buff.get_text(start, end, False)}
                 self.player_interface(action=self.TAKE_NOTE, note=note)
                 # restart the player
@@ -277,6 +278,7 @@ class Main:
             if player_instance:
                 if action is self.STOP:
                     player_instance.stop()
+                    self.selected_video_player_id = None
                 elif action is self.PAUSE:
                     player_instance.pause(paused=True)
                 elif action is self.RESUME:
@@ -305,8 +307,8 @@ class Main:
                     return player_instance.get_notes_dir()
                 elif action is self.SET_NOTES_DIR:
                     player_instance.set_notes_dir_callback(notes_directory=kwargs.get('notes_directory'))
-                elif action is self.GET_NOTE:
-                    return player_instance.get_note()
+                elif action is self.GEN_NOTE:
+                    return player_instance.gen_note()
             else:
                 print("It ain't a player!")
 
