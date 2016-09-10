@@ -37,7 +37,7 @@ class NoteMachine:
                                [{'Timestamp': video_timestamp},
                                 {'Video Source': video_source},
                                 {'Video Title': title_formatter(video_title)},
-                                {'Note': '{}'.format(note)}, ]}], f,
+                                {'Note': '\n{}\n'.format(note)}, ]}], f,
                          Dumper=Dumper, default_flow_style=False, explicit_start=False)
                 return True
             except Exception as e:
