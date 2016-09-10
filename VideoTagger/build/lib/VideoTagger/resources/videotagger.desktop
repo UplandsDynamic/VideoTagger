@@ -1,17 +1,10 @@
-#!/usr/bin/env python3
-import os
-import sys
-import subprocess
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from VideoTagger.src import run_gui as run
-
-# ensure mpv is installed on system
-try:
-    examine = subprocess.Popen(['mpv', '-v'], stdout=subprocess.PIPE, shell=False)
-    output, error = examine.communicate()
-except FileNotFoundError:
-    print('MPV does not appear to be installed on your host system! Please install it before typing again.')
-    sys.exit(1)
-
-if __name__ == '__main__':
-    run.Main()
+[Desktop Entry]
+Type=Application
+Version=0.1
+Name=VideoTagger
+Comment=A timestamped video note-taking application
+Path=/usr/lib/python3.5/site-packages
+Exec=python -m VideoTagger
+Icon=videotagger_icon-256x256.png
+Terminal=false
+#Categories=
