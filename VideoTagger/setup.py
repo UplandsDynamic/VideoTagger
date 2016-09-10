@@ -17,7 +17,7 @@ CLASSIFIERS = [
     "Topic :: Utilities",
 ]
 
-INSTALL_REQUIRES = ['python_mpv_zws', 'PyYAML']  # note: gi a dependency from OS package - e.g. python3-gi
+INSTALL_REQUIRES = ['python_mpv_zws', 'PyYAML']  # note: gi a dependency from OS package - e.g. python-gobject
 
 ###################################################################
 # # BOILER PLATE CODE
