@@ -25,7 +25,7 @@ readable and editable.
 ------------
 
 - Take timestamped notes at any point in a video at the tap of a button.
-- Run, control and note-take on multiple video streams, simultaneously.
+- Run, control and note-take on multiple video streams.
 
 ---------
 **Usage**
