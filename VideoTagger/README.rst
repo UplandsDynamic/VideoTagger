@@ -1,9 +1,15 @@
 =================
+***VideoTagger***
+=================
+
+=================
 **License**
 =================
 
 Code author: Dan Bright
+
 Code author email: productions@zaziork.com
+
 Code author website: https://www.zaziork.com
 
 This application is made available under the GNU General Public License, Version 3.
