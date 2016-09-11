@@ -1,10 +1,10 @@
-=================
-***VideoTagger***
-=================
+===============
+**VideoTagger**
+===============
 
-=================
+-----------
 **License**
-=================
+-----------
 
 Code author: Dan Bright
 
@@ -17,9 +17,9 @@ This application is made available under the GNU General Public License, Version
 For further license details, please refer to the LICENSE.txt file which should be
 bundled with this software.
 
-=================
+---------------
 **Description**
-=================
+---------------
 
 Please note, this is a very early beta prototype.
 
@@ -35,16 +35,16 @@ player, at: https://github.com/jaseg/python-mpv
 Notes are saved in a user nominated directory as YAML files. These are easily human
 readable and editable.
 
-============
+------------
 **Features**
-============
+------------
 
 - Take timestamped notes at any point in a video at the tap of a button.
 - Run, control and note-take on multiple video streams, simultaneously.
 
-===========
+---------
 **Usage**
-===========
+---------
 
 - Type or paste a video file URL (either a local file, or remote) into the "Video Source" field.
   Video files can also be dragged into this field - the source should automatically populate.
@@ -71,15 +71,15 @@ readable and editable.
     same video will require reselection of the storage directory. Once the note has been taken
     (or cancelled), the player should automatically resume playing.
 
-=============
+-----------
 **Version**
-=============
+-----------
 
 For the current version number, see VideoTagger/VERSION.rst
 
-=============
+---------------
 **Availabilty**
-=============
+---------------
 
 This application is available for Arch Linux, from the Arch User Repository (AUR). Installing from the AUR
 pulls the latest stable version from github/master. The AUR page is here:
