@@ -50,11 +50,11 @@ readable and editable.
   - Forward button: Seeks forward by 5 seconds (unit of time should be user definable in future).
   - "OSD" button: Toggles MPV's 'On Screen Display'.
   - "Take Note" button: Tap this to take a note. This will pause the player and open up a timestamped
-    note. The user will also be prompted to select a directory in which to store the note if that has
-    note already been selected earlier in video play session. Users should be aware that clicking
-    the Stop button will destroy the video session for that stream, and so subsequent opening of the
-    same video will require reselection of the storage directory. Once the note has been taken
-    (or cancelled), the player should automatically resume playing.
+    note. The user will also be prompted to select a directory in which to store the note if no
+    directory has already been defined.
+  - Users should be aware that clicking the Stop button will destroy the video session for that stream,
+    and so subsequent opening of the same video will require reselection of the storage directory.
+    Once the note has been taken (or cancelled), the player should automatically resume playing.
 
 -----------
 **Version**
