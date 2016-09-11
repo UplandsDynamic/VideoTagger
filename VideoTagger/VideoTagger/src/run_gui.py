@@ -182,59 +182,58 @@ class Main:
             if not self.player_interface(action=self.GET_NOTES_DIR):
                 self.filechooser_dialog()
             notes_dir = self.player_interface(action=self.GET_NOTES_DIR)
-            # get the existing note data
-            note_data = self.player_interface(action=self.GEN_NOTE)  # dict returned
-            # set fields
-            notes_dir_field.set_text(notes_dir)
-            notes_video_title_field.set_text(note_data.get('Video Title') or '')
-            # note: below creates a new list to pop, therefore leaving original intact for later
-            notes_video_source_field.set_text(note_data.get('Video Source') or '')
-            timestamp_field.set_text(note_data.get('Timestamp') or '')
-            note_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=7)
-            note_tv = Gtk.TextView()
-            note_tv.set_right_margin(11)
-            note_tv.set_left_margin(11)
-            note_tv.set_top_margin(11)
-            note_tv.set_bottom_margin(11)
-            note_tv.set_pixels_above_lines(3)
-            note_tv.set_pixels_below_lines(3)
-            note_tv.set_pixels_inside_wrap(3)
-            note_tv.set_wrap_mode(Gtk.WrapMode.WORD)
-            note_tv.set_editable(True)
-            note_tv.set_halign(Gtk.Align.START)
-            note_tv_buff = note_tv.get_buffer()
-            note_tv_buff.set_text(note_data.get('Note') or '')
-            note_box.pack_start(note_tv, True, True, 0)
-            note_data_box.pack_start(note_box, True, True, 0)
-            # get ref to dialog's content area
-            content_area_box = dialog.get_content_area()
-            # add content grid to content area
-            content_area_box.pack_start(self.note_dialog_grid, True, True, 0)
-            # show content
-            dialog.show_all()
-            # run dialog
-            response = dialog.run()
-            if response == Gtk.ResponseType.OK:
-                # save the note
-                start, end = note_tv_buff.get_bounds()
-                note = {'timestamp': note_data.get('Timestamp'),
-                        'video_title': note_data.get('Video Title'),
-                        'video_source': note_data.get('Video Source'),
-                        'note_data': note_tv_buff.get_text(start, end, False)}
-                self.player_interface(action=self.TAKE_NOTE, note=note)
-                # restart the player
-                self.player_interface(action=self.RESUME)
-            elif response == Gtk.ResponseType.CANCEL:
-                # restart the player
-                self.player_interface(action=self.RESUME)
-            # cleanup
-            notes_dir_field.set_text('')
-            notes_video_source_field.set_text('')
-            notes_video_title_field.set_text('')
-            note_data_box.remove(note_box)
-            # remove the grid so not destroyed (can be referenced again in new dialog)
-            content_area_box.remove(self.note_dialog_grid)
+            if notes_dir:
+                # get the existing note data
+                note_data = self.player_interface(action=self.GEN_NOTE)  # dict returned
+                # set fields
+                notes_dir_field.set_text(notes_dir)
+                notes_video_title_field.set_text(note_data.get('Video Title') or '')
+                # note: below creates a new list to pop, therefore leaving original intact for later
+                notes_video_source_field.set_text(note_data.get('Video Source') or '')
+                timestamp_field.set_text(note_data.get('Timestamp') or '')
+                note_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=7)
+                note_tv = Gtk.TextView()
+                note_tv.set_right_margin(11)
+                note_tv.set_left_margin(11)
+                note_tv.set_top_margin(11)
+                note_tv.set_bottom_margin(11)
+                note_tv.set_pixels_above_lines(3)
+                note_tv.set_pixels_below_lines(3)
+                note_tv.set_pixels_inside_wrap(3)
+                note_tv.set_wrap_mode(Gtk.WrapMode.WORD)
+                note_tv.set_editable(True)
+                note_tv.set_halign(Gtk.Align.START)
+                note_tv_buff = note_tv.get_buffer()
+                note_tv_buff.set_text(note_data.get('Note') or '')
+                note_box.pack_start(note_tv, True, True, 0)
+                note_data_box.pack_start(note_box, True, True, 0)
+                # get ref to dialog's content area
+                content_area_box = dialog.get_content_area()
+                # add content grid to content area
+                content_area_box.pack_start(self.note_dialog_grid, True, True, 0)
+                # show content
+                dialog.show_all()
+                # run dialog
+                response = dialog.run()
+                if response == Gtk.ResponseType.OK:
+                    # save the note
+                    start, end = note_tv_buff.get_bounds()
+                    note = {'timestamp': note_data.get('Timestamp'),
+                            'video_title': note_data.get('Video Title'),
+                            'video_source': note_data.get('Video Source'),
+                            'note_data': note_tv_buff.get_text(start, end, False)}
+                    self.player_interface(action=self.TAKE_NOTE, note=note)
+                elif response == Gtk.ResponseType.CANCEL:
+                    pass
+                # cleanup
+                notes_dir_field.set_text('')
+                notes_video_source_field.set_text('')
+                notes_video_title_field.set_text('')
+                note_data_box.remove(note_box)
+                # remove the grid so not destroyed (can be referenced again in new dialog)
+                content_area_box.remove(self.note_dialog_grid)
             dialog.destroy()
+            self.player_interface(action=self.RESUME)
             # gets / sets pause state
             self.player_interface(self.GET_PAUSE_BUTTON_STATE)
         else:
@@ -274,6 +273,8 @@ class Main:
                 new_player_instance.play()
                 # clear the url field for next one ..
                 self.video_source.set_text('')
+                # set current active player id to the newly created
+                self.selected_video_player_id = new_player_instance.get_player_id()
         else:
             if player_instance:
                 if action is self.STOP:

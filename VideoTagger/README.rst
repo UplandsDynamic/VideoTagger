@@ -91,14 +91,3 @@ The application is also available as a Python package, which may be installed on
 However, only major version changes are published to PyPi. The PyPi repository is here:
 
 https://pypi.python.org/pypi/VideoTagger
-
-=============
-**Roadmap**
-=============
-
-- Allow reading and editing of existing notes within applications (*PRIORITY).
-- Allow user defined player seek steps (code note: add func e.g. VideoPlayers().set_player_seek_forward_time()).
-- Write to a log file and allow users to define the level at which messages are logged (e.g. info, error).
-- Add additional storage methods (database, etc).
-- Make API available to access notes through web gui.
-- Lots more ...
