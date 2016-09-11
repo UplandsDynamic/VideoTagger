@@ -1,14 +1,22 @@
-# VideoTagger
-GTK 3.x research tool application to take timestamped tags/notes of streamed or locally played video clips. 
+# VideoTagger Application
 
-The application controls and uses MPV player and builds on the "python-mpv" python bindings script for MPV.  
+Full README, with usage instructions, available in the README.rst, here:
 
-For (a lot) more information, please see the main documentation file in VideoTagger/README.rst
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst
+
+# Brief Overview
+
+This is a GTK 3.x research tool application to take timestamped 
+tags/notes of streamed or locally played video clips. 
+
+The application controls and uses MPV player and builds on the 
+"python-mpv" python bindings script for MPV.  
 
 This package is available in the Arch User Repository (AUR) at: 
 
 https://aur.archlinux.org/packages/videotagger/
 
-It is also available on PyPi, however only major version changes are pushed here:
+It is also available on PyPi, however only major version changes are 
+pushed here:
 
 https://pypi.python.org/pypi/VideoTagger
