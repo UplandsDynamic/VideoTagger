@@ -60,7 +60,9 @@ readable and editable.
 **Version**
 -----------
 
-For the current version number, see VideoTagger/VERSION.rst
+For the current version number, see the VERSION.rst file, available here:
+
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/VERSION.rst
 
 ---------------
 **Availabilty**
@@ -96,4 +98,6 @@ Code author website: https://www.zaziork.com
 This application is made available under the GNU General Public License, Version 3.
 
 For further license details, please refer to the LICENSE.txt file which should be
-bundled with this software.
+bundled with this software and is available here:
+
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/LICENSE.txt
