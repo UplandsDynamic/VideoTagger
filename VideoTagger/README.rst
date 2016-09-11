@@ -2,21 +2,6 @@
 **VideoTagger**
 ===============
 
------------
-**License**
------------
-
-Code author: Dan Bright
-
-Code author email: productions@zaziork.com
-
-Code author website: https://www.zaziork.com
-
-This application is made available under the GNU General Public License, Version 3.
-
-For further license details, please refer to the LICENSE.txt file which should be
-bundled with this software.
-
 ---------------
 **Description**
 ---------------
@@ -97,3 +82,18 @@ The application is also available as a Python package, which may be installed on
 However, only major version changes are published to PyPi. The PyPi repository is here:
 
 https://pypi.python.org/pypi/VideoTagger
+
+-----------
+**License**
+-----------
+
+Code author: Dan Bright
+
+Code author email: productions@zaziork.com
+
+Code author website: https://www.zaziork.com
+
+This application is made available under the GNU General Public License, Version 3.
+
+For further license details, please refer to the LICENSE.txt file which should be
+bundled with this software.
