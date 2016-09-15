@@ -14,7 +14,7 @@ Clips may be played from local files, or streamed from remote sources such as Yo
 
 It acts as an interface to control the excellent Open Source MPV player, at: https://mpv.io/.
 
-The application builds on an Open Source project that provides Python bindings to the MPV
+The application depends on super Open Source project that provides Python bindings to the MPV
 player, at: https://github.com/jaseg/python-mpv
 
 Notes are saved in a user nominated directory as YAML files. These are easily human
@@ -25,7 +25,7 @@ readable and editable.
 ------------
 
 - Take timestamped notes at any point in a video at the tap of a button.
-- Run, control and note-take on multiple video streams.
+- Run, control and note-take on video streams.
 
 ---------
 **Usage**
@@ -36,10 +36,7 @@ readable and editable.
 
 - Wait for the video to begin playing. The video should open in MPV player.
 
-- A video session ID will appear in the main application window. The needs to be selected by
-  a single click/tap. Once selected, it will be highlighted. It is important to ensure that
-  the session you wish to control is selected. Multiple streams may be controlled by
-  selecting the appropriate ID before using the control bar to control the selected session.
+- A video session ID will appear in the main application window, which may be selected by a click.
 
 - The video may be controlled via the application's control bar:
 
@@ -62,7 +59,7 @@ readable and editable.
 
 For the current version number, see the VERSION.rst file, available here:
 
-https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/VERSION.rst
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VERSION.rst
 
 ---------------
 **Availabilty**

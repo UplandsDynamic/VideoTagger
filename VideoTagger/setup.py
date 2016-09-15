@@ -29,7 +29,7 @@ setup(
                 "Uses MPV player.",
     license="GNU General Public License v3 or later (GPLv3+)",
     url="https://www.zaziork.com",
-    version=open('VideoTagger/VERSION.rst').read(),
+    version=open('VERSION.rst').read(),
     author="Dan Bright",
     author_email="productions@zaziork.com",
     maintainer="Dan Bright",
