@@ -1,18 +1,19 @@
 import random
 import python_mpv_zws as mpv
 from . import engine_room
-
+import _thread
+import time
 
 class VideoPlayers:
-    def __init__(self, treestore=None):
+    def __init__(self, treestore=None, slider=None):
         self.video_players = {}
         # reference to treestore - model containing display text for the states treeview
         self.treestore = treestore
         self.player_seek_back_time = -5
         self.player_seek_forward_time = 5
+        self.progress_slider = slider
 
-    def register_player(self, video_player):
-        self.video_players[video_player.get_player_id()] = video_player
+    ''' GETTERS '''
 
     def get_player(self, player_id):
         try:
@@ -20,18 +21,25 @@ class VideoPlayers:
         except KeyError:
             return None
 
-    def remove_player(self, player_id):
-        if player_id:
-            try:
-                del self.video_players[player_id]
-            except KeyError:
-                print('That player ID does not exist!')
+    ''' SETTERS'''
 
     def set_player_seek_back_time(self, seconds=1):
         self.player_seek_back_time = seconds
 
     def set_player_seek_forward_time(self, seconds=1):
         self.player_seek_forward_time = seconds
+
+    ''' DO-ERS '''
+
+    def register_player(self, video_player):
+        self.video_players[video_player.get_player_id()] = video_player
+
+    def remove_player(self, player_id):
+        if player_id:
+            try:
+                del self.video_players[player_id]
+            except KeyError:
+                print('That player ID does not exist!')
 
     def __str__(self):
         return 'Object containing a group of VideoPlayer objects. Should be unique per gui instance.'
@@ -51,7 +59,9 @@ class VideoPlayer:
         self.video_players_group = video_players_group
         self.state = None
         self.source = source
-        self.mpv = mpv.MPV(log_handler=self.logger,
+
+        self.mpv = mpv.MPV('input-vo-keyboard',
+                        log_handler=self.logger,
                            ytdl=True,
                            input_default_bindings=True,
                            input_vo_keyboard=True)
@@ -66,10 +76,90 @@ class VideoPlayer:
         self.treestore_source_field = None
         self.notes_dir = None
         self.note = None
+        # timing
+        self.video_length = None
+        self.length_lock = False  # only allow length to be set once per video!
+        self.time_remaining = 0
+        self.pos = 0
+        self.progress_slider = self.video_players_group.progress_slider
+
+    ''' OBSERVERS '''
+
+    # self.mpv observe_property watches the ongoing property value for changes & feeds to the lambda
+    # callback. Useful for times, watching for realtime changes, etc. Use get_property for static gets.
+
+    def remaining_time_observer(self):
+        self.mpv.observe_property('time-remaining',
+                                  lambda observed_value: self.set_time_remaining(
+                                      observed_value=observed_value))
+
+    def video_position_observer(self):
+        self.mpv.observe_property('time-pos', lambda pos: self.set_video_position(pos))
+
+    ''' SETTERS '''
 
     def set_player_state(self, state):
         self.state = state
         self.state = state
+
+    def set_time_remaining(self, observed_value):
+        self.time_remaining = observed_value
+
+    def set_video_length(self):
+        if not self.length_lock:  # only allow to be set ONCE for each video!
+            _thread.start_new_thread(self.video_length_setter, ())
+
+    def video_length_setter(self):
+        self.length_lock = True
+        # run in own thread so doesn't block whilst looping until mpv returns value
+        for attempt in range(61):
+            if self.get_time_remaining():
+                self.video_length = self.get_time_remaining()
+                # log it
+                self.logger('info', 'cplayer', 'Video length set as: {}'.format(
+                    str(self.get_time_remaining())))
+                # set the slider
+                self.set_progress_slider_length()
+                return True  # ends the thread by returning True when value set
+            elif not self.get_time_remaining():
+                try:
+                    player = self.mpv  # check player still exists
+                    self.logger('info', 'cplayer', 'No video length retrieved yet ...')
+                    time.sleep(1)
+                except AttributeError:
+                    break
+        self.logger('error', 'cplayer', 'MVP did not return a valid video length')
+
+    def set_video_position(self, pos):
+        print('Now playing at {:.2f}s'.format(pos))
+        self.pos = pos
+        # set the progress slider position
+        self.progress_slider.set_value(pos)
+
+    def change_video_position(self, pos):
+        self.mpv._set_property('time-pos', pos)
+
+    def set_notes_dir_callback(self, notes_directory):
+        # set the directory attribute
+        self.notes_dir = engine_room.sanitize_filter(notes_directory)
+        # update the treestore
+        self.video_players_group.treestore.set_value(
+            self.treestore_note_location_field, 1, self.notes_dir)
+        return True
+
+    def set_progress_slider_length(self):
+        try:
+            self.progress_slider.set_upper(self.get_video_length())
+            print('Progress bar length set at: {}'.format(str(self.get_video_length())))
+        except TypeError:
+            # exception thrown if length not yet retrieved
+            self.logger('info', 'cplayer', 'MVP did not yet return a valid video length')
+            # set the video length (will only set if set process not already running)
+            self.set_video_length()
+            # reset to 0 whilst waiting ...
+            self.progress_slider.set_upper(0.00)
+
+    ''' GETTERS '''
 
     def get_player_state(self):
         try:
@@ -82,6 +172,25 @@ class VideoPlayer:
 
     def get_player_id(self):
         return self.player_id
+
+    def get_time_remaining(self):
+        return self.time_remaining
+
+    def get_video_length(self):
+        return self.video_length
+
+    def get_video_position(self):
+        return self.pos
+
+    def get_notes_dir(self):
+        return self.notes_dir
+
+    def get_progress_slider_state(self):
+        ''' this is the thang ... '''
+        # sets the progress slider to represent the state of the currently selected video
+        self.set_progress_slider_length()
+
+    ''' DO-ERS '''
 
     def logger(self, loglevel, component, message):
         # incoming log entries
@@ -106,14 +215,6 @@ class VideoPlayer:
         # do something with the message - write to file, or print to console
         print('[{}] {}: {}'.format(loglevel, component, message))
 
-    def set_notes_dir_callback(self, notes_directory):
-        # set the directory attribute
-        self.notes_dir = engine_room.sanitize_filter(notes_directory)
-        # update the treestore
-        self.video_players_group.treestore.set_value(
-            self.treestore_note_location_field, 1, self.notes_dir)
-        return True
-
     def save_note(self, note):
         if note:
             if engine_room.NoteMachine.save_note(notes_dir=self.notes_dir,
@@ -126,9 +227,6 @@ class VideoPlayer:
                 return True
         self.logger('error', 'note', 'Error: Note not taken!')
 
-    def get_notes_dir(self):
-        return self.notes_dir
-
     def gen_note(self):
         return {'Note': '',
                 'Timestamp': self.mpv._get_property('time-pos'),
@@ -138,45 +236,34 @@ class VideoPlayer:
             'error', 'note', 'There was an error opening the note file!')
 
     def play(self):
-
-        ''' NOTE on get/set/observer properties'''
-        # self.mpv.get_property gets the current value of the property. Likewise for set_property.
-        #
-        # self.mpv observe_property watches the ongoing property value for changes and feeds it into the lambda
-        # callback. Useful for times, watching for realtime changes, etc.
-
-        # Property access, these can be changed at runtime
-        # keep printing time to console
-        self.mpv.observe_property('time-pos', lambda pos: print('Now playing at {:.2f}s'.format(pos)))
         # define fullscreen
         self.mpv.fullscreen = False
         # define whether loops
-        self.mpv.loop = 'inf'
+        self.mpv.loop = 'no'
         # Option access, in general these require the core to reinitialize
         self.mpv['vo'] = 'opengl'
         # set seek hr-seek to yes, to be precise rather than nearest keyframe when possible
         self.mpv._set_property(name='hr-seek', value='yes', proptype=str)
         # start with osd on, at level 3
         self.mpv._set_property(name='osd-level', value=3, proptype=int)
-
         # mute
-        self.mpv._set_property(name='mute', value=True, proptype=bool)
+        self.mpv._set_property(name='mute', value=False, proptype=bool)
 
         # custom key bindings
         def my_q_binding(state, key):
             if state[0] == 'd':
-                print('The d key was pressed @: '.
-                      format(self.mpv.observe_property('time-pos',
-                                                       lambda pos: print('{:.2f}s'.
-                                                                         format(pos)))))
+                print('The d key was pressed!')  # debug
+
+        def my_close_binding(state, key):
+            self.stop()
 
         self.mpv.register_key_binding('d', my_q_binding)
+        self.mpv.register_key_binding('CLOSE_WIN', my_close_binding)
 
         if self.source:
             # start video
             self.mpv.loadfile(filename=self.source, mode='replace')
             self.set_player_state(self.PLAYING)
-
             # # # DEFINE TREESTORE CHILDREN
             # set the displayed state
             self.treestore_state_field = self.video_players_group.treestore.append(
@@ -198,12 +285,15 @@ class VideoPlayer:
                                           self.treestore_title_field, 1, '{}'.format(text)) if text
                                       else None)
             print('Starting player with ID: {}'.format(self.get_player_id()))
+            # kick off the remaining time observer
+            self.remaining_time_observer()
+            # kick off video position observer
+            self.video_position_observer()
+            # get the progress slider  (sets the video length too)
+            self.get_progress_slider_state()
         else:
-            print('No source, there is no source!')
+            self.logger('error', 'cplayer', 'No source, there is no source, where is my source?!')
             self.stop()
-
-            # self.player.wait_for_playback()
-            # del self.player
 
     def stop(self):
         try:

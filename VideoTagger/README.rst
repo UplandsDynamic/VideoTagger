@@ -25,7 +25,7 @@ readable and editable.
 ------------
 
 - Take timestamped notes at any point in a video at the tap of a button.
-- Run, control and note-take on multiple video streams.
+- Run, control and note-take on video streams.
 
 ---------
 **Usage**
@@ -36,10 +36,7 @@ readable and editable.
 
 - Wait for the video to begin playing. The video should open in MPV player.
 
-- A video session ID will appear in the main application window. The needs to be selected by
-  a single click/tap. Once selected, it will be highlighted. It is important to ensure that
-  the session you wish to control is selected. Multiple streams may be controlled by
-  selecting the appropriate ID before using the control bar to control the selected session.
+- A video session ID will appear in the main application window, which may be selected by a click.
 
 - The video may be controlled via the application's control bar:
 

@@ -68,6 +68,15 @@ def title_formatter(video_title):
     return sanitize_filter(space_replace)
 
 
+def source_filter(source):
+    # return, optimised to cope with local paths if a local file
+    if 'file://' in source:
+        return "{}".format(source.replace('file://', '')
+                           .replace('%20', ' ').strip())
+    else:
+        return source
+
+
 def sanitize_filter(incoming=None):
     if not incoming: return None
     # sanitize the strings

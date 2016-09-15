@@ -26,6 +26,9 @@ class Main:
     GET_NOTES_DIR = 'Gets the currently selected notes directory for the player'
     SET_NOTES_DIR = 'Callback to set the player notes directory'
     MAKE_CONFIG_DIR = False  # Unnecessary for now ...
+    GET_PROGRESS_SLIDER_STATE = 'Gets progress slider for selected video'
+    SEEK_TO = 'Seeks to position in video stream'
+    GET_POSITION = 'Gets current video position in stream'
 
     def __init__(self):
 
@@ -59,6 +62,7 @@ class Main:
         self.select_dir_button = self.builder.get_object('notes_dir_button')
         self.video_source = self.builder.get_object('video_source')
         self.note_dialog_grid = self.builder.get_object('note_dialog_grid')
+        self.mpv_seek_adjustment = self.builder.get_object('mpv_seek_adjustment')
         # video player
         self.video_player_list_container = self.builder.get_object('video_player_list_container')
         # # CREATE TREEVIEW / TREESTORE
@@ -91,7 +95,7 @@ class Main:
         # add the treeview to the container
         self.video_player_list_container.pack_start(self.treeview, True, True, 0)
         # get reference to video players group
-        self.video_players = VideoPlayers(treestore=self.treestore)
+        self.video_players = VideoPlayers(treestore=self.treestore, slider=self.mpv_seek_adjustment)
         # define references to selections
         self.selected_video_player_id = None
         self.selected_video_player_notes = None
@@ -102,6 +106,9 @@ class Main:
 
         # RUN THE GTK
         Gtk.main()
+
+    def __str__(self):
+        return 'VideoTagger'
 
     # # # # GTK EVENT HANDLERS
 
@@ -136,6 +143,14 @@ class Main:
                 self.player_interface(action=self.PAUSE)
             else:
                 self.player_interface(action=self.RESUME)
+
+    def on_adjustment_changed(self, widget):
+        if widget == self.mpv_seek_adjustment:
+            # seek to slider position if slider moved more than 5 seconds from current
+            current_pos = self.player_interface(action=self.GET_POSITION)
+            moved_pos = self.mpv_seek_adjustment.get_value()
+            if current_pos and (moved_pos < current_pos - 5 or moved_pos > current_pos + 5):
+                self.player_interface(action=self.SEEK_TO)
 
     # # # FILE CHOOSER WIDGET
 
@@ -250,7 +265,8 @@ class Main:
         self.selected_video_player_id = model.get_value(model.get_iter(player_id_treepath), 1)
         # get pause button state
         self.player_interface(action=self.GET_PAUSE_BUTTON_STATE)
-        print(self.selected_video_player_id)
+        # set progress slider state to the selected video
+        self.player_interface(action=self.GET_PROGRESS_SLIDER_STATE)
 
     # # # PLAYER INTERFACE
 
@@ -263,10 +279,14 @@ class Main:
         # set existing player instance (if any)
         player_instance = self.video_players.get_player(self.selected_video_player_id)
         if action is self.PLAY:
+            # restrict to one video at a time until refactor for better multi solution
+            if player_instance:
+                player_instance.stop()
             if self.video_source.get_text():
                 # create a new player
-                new_player_instance = VideoPlayer(source=self.video_source.get_text(),
-                                                  video_players_group=self.video_players)
+                new_player_instance = VideoPlayer(source=engine_room.source_filter(
+                    self.video_source.get_text()),
+                    video_players_group=self.video_players)
                 # register the player
                 self.video_players.register_player(video_player=new_player_instance)
                 # play
@@ -310,8 +330,15 @@ class Main:
                     player_instance.set_notes_dir_callback(notes_directory=kwargs.get('notes_directory'))
                 elif action is self.GEN_NOTE:
                     return player_instance.gen_note()
+                elif action is self.GET_PROGRESS_SLIDER_STATE:
+                    player_instance.get_progress_slider_state()
+                elif action is self.SEEK_TO:
+                    player_instance.change_video_position(self.mpv_seek_adjustment.get_value())
+                elif action is self.GET_POSITION:
+                    return player_instance.get_video_position()
             else:
                 print("It ain't a player!")
+
 
 if __name__ == '__main__':
     Main()
