@@ -10,7 +10,7 @@ from .video_players import VideoPlayer, VideoPlayers
 from . import engine_room
 
 
-class Main:
+class VideoTagger:
     PROJECT_ROOT = engine_room.PROJECT_ROOT
     # control buttons
     PLAY = 'Play the video'
@@ -41,6 +41,18 @@ class Main:
         with open('{}/VERSION.rst'.format(self.PROJECT_ROOT)) as in_file:
             self.app_version = engine_room.sanitize_filter(in_file.read())[0:7]
 
+        # set license from file
+        with open('{}/LICENSE.txt'.format(self.PROJECT_ROOT)) as in_file:
+            self.license_text = in_file.read()
+
+        # set short description from file
+        with open('{}/SHORT_DESCRIPTION.txt'.format(self.PROJECT_ROOT)) as in_file:
+            self.short_desc = in_file.read()
+
+        # set manual from file
+        with open('{}/MANUAL.txt'.format(self.PROJECT_ROOT)) as in_file:
+            self.manual = in_file.read()
+
         ''' GLADE '''
         # # # # # # # TOP LEVEL GLADE SETUP
         self.glade_file = '{}/resources/videotagger.glade'.format(self.PROJECT_ROOT)
@@ -63,6 +75,7 @@ class Main:
         self.take_note_button = self.builder.get_object('take_note_button')
         self.select_dir_button = self.builder.get_object('notes_dir_button')
         self.about_blurb_button = self.builder.get_object('about_blurb_button')
+        self.usage_button = self.builder.get_object('usage_button')
         # edit texts
         self.video_source = self.builder.get_object('video_source')
         # grids
@@ -143,12 +156,13 @@ class Main:
             self.about_dialog = self.builder.get_object('aboutdialog')
             # update version number in about info
             self.about_dialog.set_version(self.app_version)
+            self.about_dialog.set_license(self.license_text)
             response = self.about_dialog.run()
             self.about_dialog.hide()
         elif menuitem == self.usage_menu_item:
             self.info_textview.set_editable(False)
             self.info_textview.set_cursor_visible(False)
-            self.info_textview_buffer.set_text(engine_room.Blurb.USAGE_BLURB)
+            self.info_textview_buffer.set_text(self.manual)
             response = self.info_dialog.run()
             self.info_dialog.hide()
 
@@ -170,10 +184,9 @@ class Main:
         if button == self.select_dir_button:
             self.filechooser_dialog()
         if button == self.about_blurb_button:
-            self.info_textview.set_cursor_visible(False)
-            self.info_textview_buffer.set_text(engine_room.Blurb.ABOUT_BLURB)
-            response = self.info_dialog.run()
-            self.info_dialog.hide()
+            self.info_dialog_show(self.short_desc)
+        if button == self.usage_button:
+            self.info_dialog_show(self.manual)
 
     def on_button_toggled(self, button):
         if button == self.pause_button:
@@ -212,6 +225,14 @@ class Main:
         filter_text.set_name("YAML Files")
         filter_text.add_pattern('*.yaml')
         dialog.add_filter(filter_text)
+
+    # # # INFO DIALOG
+
+    def info_dialog_show(self, blurb):
+        self.info_textview.set_cursor_visible(False)
+        self.info_textview_buffer.set_text(blurb)
+        response = self.info_dialog.run()
+        self.info_dialog.hide()
 
     # # # NOTE TAKER DIALOG
 
@@ -376,7 +397,3 @@ class Main:
                     return player_instance.get_video_position()
             else:
                 print("It ain't a player!")
-
-
-if __name__ == '__main__':
-    Main()
