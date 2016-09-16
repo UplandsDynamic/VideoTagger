@@ -134,7 +134,7 @@ class VideoTagger:
         self.window.show_all()
 
         # RUN THE GTK
-        Gtk.main()
+        # Gtk.main()
 
     def __str__(self):
         return 'VideoTagger'

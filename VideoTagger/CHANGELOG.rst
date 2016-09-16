@@ -2,6 +2,13 @@
 Version 0.2
 ============
 
+- Added About dialog
+- Added usage manual
+
+============
+Version 0.2
+============
+
 - Addition of a movable progress bar.
 - Numerous minor GUI changes and bug fixes.
 
