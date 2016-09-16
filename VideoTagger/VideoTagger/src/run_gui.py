@@ -42,7 +42,7 @@ class Main:
             self.app_version = engine_room.sanitize_filter(in_file.read())[0:7]
 
         ''' GLADE '''
-        # # # TOP LEVEL GLADE SETUP
+        # # # # # # # TOP LEVEL GLADE SETUP
         self.glade_file = '{}/resources/videotagger.glade'.format(self.PROJECT_ROOT)
         # create builder and add the glade file
         self.builder = Gtk.Builder()
@@ -51,7 +51,9 @@ class Main:
         self.builder.connect_signals(self)
         # get the top level glade object
         self.window = self.builder.get_object('main_window')
-        # # CREATE INSTANCE REFERENCES TO WIDGETS
+
+        # # # CREATE INSTANCE REFERENCES TO WIDGETS
+        # buttons
         self.start_button = self.builder.get_object('start_button')
         self.stop_button = self.builder.get_object('stop_button')
         self.pause_button = self.builder.get_object('pause_button')
@@ -60,14 +62,26 @@ class Main:
         self.osd_button = self.builder.get_object('toggle_osd')
         self.take_note_button = self.builder.get_object('take_note_button')
         self.select_dir_button = self.builder.get_object('notes_dir_button')
+        self.about_blurb_button = self.builder.get_object('about_blurb_button')
+        # edit texts
         self.video_source = self.builder.get_object('video_source')
+        # grids
         self.note_dialog_grid = self.builder.get_object('note_dialog_grid')
         self.mpv_seek_adjustment = self.builder.get_object('mpv_seek_adjustment')
+        # menus
+        self.about_menu_item = self.builder.get_object('menu_about')
+        self.usage_menu_item = self.builder.get_object('menu_usage')
+        # dialogs
         self.about_dialog = self.builder.get_object('aboutdialog')
-
-        # video player
+        self.info_dialog = self.builder.get_object('info_dialog')
+        # textviews
+        self.info_textview = self.builder.get_object('info_textview')
+        # textview buffers
+        self.info_textview_buffer = self.builder.get_object('info_textview_buffer')
+        # boxes
         self.video_player_list_container = self.builder.get_object('video_player_list_container')
-        # # CREATE TREEVIEW / TREESTORE
+
+        # # # CREATE TREEVIEW / TREESTORE
         # create treestore
         self.treestore = Gtk.TreeStore(str, str)
         # create treeview
@@ -90,7 +104,6 @@ class Main:
         self.tv_action_cell.set_fixed_size(-1, -1)
         self.tv_action_col.pack_start(self.tv_action_cell, expand=True)
         self.tv_action_col.add_attribute(self.tv_action_cell, 'text', 1)
-        # self.tv_action_col.set_sort_column_id(1)
         # add the columns to the treeview
         self.treeview.append_column(self.tvcol)
         self.treeview.append_column(self.tv_action_col)
@@ -98,11 +111,12 @@ class Main:
         self.video_player_list_container.pack_start(self.treeview, True, True, 0)
         # get reference to video players group
         self.video_players = VideoPlayers(treestore=self.treestore, slider=self.mpv_seek_adjustment)
-        # define references to selections
+
+        # # # SELECTION REFERENCES
         self.selected_video_player_id = None
         self.selected_video_player_notes = None
 
-        # SHOW THE MAIN WINDOW
+        # # # # # # # SHOW THE MAIN WINDOW
         print('Showing window ...')
         self.window.show_all()
 
@@ -123,13 +137,20 @@ class Main:
 
     # # # MENU
 
-    def on_help_activate(self, menuitem, data=None):
-        # get the object and assign to the attribute
-        self.about_dialog = self.builder.get_object('aboutdialog')
-        # update version number in about info
-        self.about_dialog.set_version(self.app_version)
-        response = self.about_dialog.run()
-        self.about_dialog.hide()
+    def on_menu_activate(self, menuitem, data=None):
+        if menuitem == self.about_menu_item:
+            # get the object and assign to the attribute
+            self.about_dialog = self.builder.get_object('aboutdialog')
+            # update version number in about info
+            self.about_dialog.set_version(self.app_version)
+            response = self.about_dialog.run()
+            self.about_dialog.hide()
+        elif menuitem == self.usage_menu_item:
+            self.info_textview.set_editable(False)
+            self.info_textview.set_cursor_visible(False)
+            self.info_textview_buffer.set_text(engine_room.Blurb.USAGE_BLURB)
+            response = self.info_dialog.run()
+            self.info_dialog.hide()
 
     # # # BUTTONS
 
@@ -148,6 +169,11 @@ class Main:
             self.on_take_note_clicked()
         if button == self.select_dir_button:
             self.filechooser_dialog()
+        if button == self.about_blurb_button:
+            self.info_textview.set_cursor_visible(False)
+            self.info_textview_buffer.set_text(engine_room.Blurb.ABOUT_BLURB)
+            response = self.info_dialog.run()
+            self.info_dialog.hide()
 
     def on_button_toggled(self, button):
         if button == self.pause_button:

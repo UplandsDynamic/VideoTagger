@@ -2,59 +2,15 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkAboutDialog" id="aboutdialog">
+  <object class="GtkImage">
+    <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="window_position">mouse</property>
-    <property name="type_hint">dialog</property>
-    <property name="transient_for">main_window</property>
-    <property name="program_name">VideoTagger</property>
-    <property name="version">0.0</property>
-    <property name="copyright" translatable="yes">(c)2016 Dan Bright | www.aninstanceofme.com</property>
-    <property name="comments" translatable="yes">This application is currently a prototype.
-
-Bugs &amp; feature requests welcome!</property>
-    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst</property>
-    <property name="website_label" translatable="yes">
-Details &amp; Usage Instructions (web)
-</property>
-    <property name="authors">Dan Bright (Zaziork Web Solutions)</property>
-    <property name="logo">videotagger_icon_128x128.png</property>
-    <property name="license_type">gpl-3-0</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <child type="titlebar">
-      <object class="GtkHeaderBar" id="about_dialog_header">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="title">VideoTagger</property>
-        <property name="show_close_button">True</property>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
+    <property name="icon_name">usage_icon</property>
+  </object>
+  <object class="GtkImage">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-dialog-question</property>
   </object>
   <object class="GtkImage" id="back_button_icon">
     <property name="visible">True</property>
@@ -65,6 +21,9 @@ Details &amp; Usage Instructions (web)
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-forward</property>
+  </object>
+  <object class="GtkTextBuffer" id="info_textview_buffer">
+    <property name="text" translatable="yes">Usage ...</property>
   </object>
   <object class="GtkAdjustment" id="mpv_seek_adjustment">
     <property name="upper">100</property>
@@ -327,6 +286,11 @@ Details &amp; Usage Instructions (web)
     <property name="can_focus">False</property>
     <property name="stock">gtk-edit</property>
   </object>
+  <object class="GtkImage" id="usage_ico">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-dialog-question</property>
+  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="name">VideoTagger</property>
     <property name="can_focus">False</property>
@@ -353,7 +317,6 @@ Details &amp; Usage Instructions (web)
               <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="right_justified">True</property>
                 <property name="label" translatable="yes">_Help</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
@@ -361,7 +324,7 @@ Details &amp; Usage Instructions (web)
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_about_activate">
+                      <object class="GtkImageMenuItem" id="menu_about">
                         <property name="label">gtk-about</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -369,7 +332,20 @@ Details &amp; Usage Instructions (web)
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <property name="always_show_image">True</property>
-                        <signal name="activate" handler="on_help_activate" swapped="no"/>
+                        <signal name="activate" handler="on_menu_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="menu_usage">
+                        <property name="label" translatable="yes">Usage</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="right_justified">True</property>
+                        <property name="use_underline">True</property>
+                        <property name="image">usage_ico</property>
+                        <property name="use_stock">False</property>
+                        <property name="always_show_image">True</property>
+                        <signal name="activate" handler="on_menu_activate" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -570,5 +546,140 @@ Details &amp; Usage Instructions (web)
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAboutDialog" id="aboutdialog">
+    <property name="can_focus">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="type_hint">dialog</property>
+    <property name="accept_focus">False</property>
+    <property name="focus_on_map">False</property>
+    <property name="transient_for">main_window</property>
+    <property name="program_name">VideoTagger</property>
+    <property name="version">0.0</property>
+    <property name="copyright" translatable="yes">(c)2016 Dan Bright | www.zaziork.com</property>
+    <property name="comments" translatable="yes">This application is currently a prototype.
+
+Bugs &amp; feature requests welcome!</property>
+    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst</property>
+    <property name="website_label" translatable="yes">
+Further Information (web)
+</property>
+    <property name="authors">Dan Bright (Zaziork Web Solutions)</property>
+    <property name="logo">videotagger_icon_128x128.png</property>
+    <property name="license_type">gpl-3-0</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="about_dialog_main">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="title">VideoTagger</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkButton" id="about_blurb_button">
+            <property name="label">gtk-info</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_stock">True</property>
+            <property name="always_show_image">True</property>
+            <signal name="clicked" handler="on_button_clicked" swapped="no"/>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkDialog" id="info_dialog">
+    <property name="can_focus">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="default_width">800</property>
+    <property name="default_height">600</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">main_window</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="info_textview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="pixels_above_lines">1</property>
+                <property name="pixels_below_lines">1</property>
+                <property name="pixels_inside_wrap">1</property>
+                <property name="wrap_mode">word</property>
+                <property name="left_margin">3</property>
+                <property name="right_margin">3</property>
+                <property name="top_margin">3</property>
+                <property name="bottom_margin">3</property>
+                <property name="buffer">info_textview_buffer</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="title">VideoTagger Information</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkImage" id="usage_icon">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-dialog-question</property>
   </object>
 </interface>
