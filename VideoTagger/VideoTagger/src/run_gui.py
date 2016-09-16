@@ -63,6 +63,8 @@ class Main:
         self.video_source = self.builder.get_object('video_source')
         self.note_dialog_grid = self.builder.get_object('note_dialog_grid')
         self.mpv_seek_adjustment = self.builder.get_object('mpv_seek_adjustment')
+        self.about_dialog = self.builder.get_object('aboutdialog')
+
         # video player
         self.video_player_list_container = self.builder.get_object('video_player_list_container')
         # # CREATE TREEVIEW / TREESTORE
@@ -118,6 +120,16 @@ class Main:
         print('Quit with Cancel ...')
         self.window.destroy()
         Gtk.main_quit()
+
+    # # # MENU
+
+    def on_help_activate(self, menuitem, data=None):
+        # get the object and assign to the attribute
+        self.about_dialog = self.builder.get_object('aboutdialog')
+        # update version number in about info
+        self.about_dialog.set_version(self.app_version)
+        response = self.about_dialog.run()
+        self.about_dialog.hide()
 
     # # # BUTTONS
 
