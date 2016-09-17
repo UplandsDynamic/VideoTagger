@@ -64,6 +64,8 @@ class VideoTagger:
         self.builder.connect_signals(self)
         # get the top level glade object
         self.window = self.builder.get_object('main_window')
+        self.window.set_wmclass("VideoTagger", "VideoTagger")
+        self.window.set_title("VideoTagger")
 
         # # # CREATE INSTANCE REFERENCES TO WIDGETS
         # buttons
