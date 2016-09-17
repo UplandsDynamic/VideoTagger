@@ -243,7 +243,7 @@ class VideoPlayer:
         # Option access, in general these require the core to reinitialize
         self.mpv['vo'] = 'opengl'
         # set seek hr-seek to yes, to be precise rather than nearest keyframe when possible
-        self.mpv._set_property(name='hr-seek', value='yes', proptype=str)
+        self.mpv._set_property(name='hr-seek', value='absolute', proptype=str)
         # start with osd on, at level 3
         self.mpv._set_property(name='osd-level', value=3, proptype=int)
         # mute
