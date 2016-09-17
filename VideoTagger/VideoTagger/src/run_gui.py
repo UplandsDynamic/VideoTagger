@@ -343,7 +343,7 @@ class VideoTagger:
         if action is self.PLAY:
             # restrict to one video at a time until refactor for better multi solution
             if player_instance:
-                player_instance.stop()
+                pass
             if self.video_source.get_text():
                 # create a new player
                 new_player_instance = VideoPlayer(source=engine_room.source_filter(
