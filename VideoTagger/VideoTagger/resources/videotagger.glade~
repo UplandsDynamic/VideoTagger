@@ -569,7 +569,9 @@
     <property name="copyright" translatable="yes">(c)2016 Dan Bright | dan@aninstanceofme.com | www.zaziork.com</property>
     <property name="comments" translatable="yes">This is a prototype. Usage may contaminate your warp coils.
 
-This applications creates timestamped notes for video clips.</property>
+This applications creates timestamped notes for video clips.
+
+Hit the buttons below for further blub.</property>
     <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst</property>
     <property name="website_label" translatable="yes">
 Further Information (web)

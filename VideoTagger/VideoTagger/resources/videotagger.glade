@@ -572,7 +572,7 @@
 This applications creates timestamped notes for video clips.
 
 Hit the buttons below for further blub.</property>
-    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst</property>
+    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/README.rst</property>
     <property name="website_label" translatable="yes">
 Further Information (web)
 </property>

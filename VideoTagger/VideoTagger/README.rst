@@ -33,7 +33,7 @@ readable and editable.
 
 Usage instructions are available in the MANUAL.txt file, available here:
 
-https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/MANUAL.txt
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/MANUAL.txt
 
 -----------
 **Version**
@@ -41,7 +41,7 @@ https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/MANUAL.txt
 
 For the current version number, see the VERSION.rst file, available here:
 
-https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VERSION.rst
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/VERSION.rst
 
 ---------------
 **Availabilty**
@@ -79,4 +79,4 @@ This application is made available under the GNU General Public License, Version
 For further license details, please refer to the LICENSE.txt file which should be
 bundled with this software and is available here:
 
-https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/LICENSE.txt
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/LICENSE.txt
