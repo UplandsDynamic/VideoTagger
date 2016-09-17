@@ -34,6 +34,7 @@
     <property name="upper">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">1</property>
+    <property name="page_size">1</property>
     <signal name="value-changed" handler="on_adjustment_changed" swapped="no"/>
   </object>
   <object class="GtkImage" id="note_dir_icon">
@@ -303,6 +304,8 @@
   </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="name">VideoTagger</property>
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">VideoTagger</property>
     <property name="default_width">800</property>
