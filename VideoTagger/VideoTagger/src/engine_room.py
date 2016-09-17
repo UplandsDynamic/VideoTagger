@@ -13,7 +13,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 CONFIG_DIR = '{}/.config/video_tagger'.format(os.getenv('USERPROFILE') or os.getenv('HOME'))
 CONFIG_FILENAME = 'video_tagger.conf'
 FULL_CONFIG_FILE_PATH = '{}/{}'.format(CONFIG_DIR, CONFIG_FILENAME)
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 SAVE_TYPE_YAML = 'Save as YAML file'
 
 

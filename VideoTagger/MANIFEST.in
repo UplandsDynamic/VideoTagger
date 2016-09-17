@@ -1,4 +1,8 @@
 ## Extra includes
 include VideoTagger/VERSION.rst
-include README.rst
+include VideoTagger/README.rst
+include VideoTagger/CHANGELOG.rst
+include VideoTagger/MANUAL.txt
+include VideoTagger/LICENSE.txt
+include VideoTagger/SHORT_DESCRIPTION.txt
 recursive-include VideoTagger/resources *

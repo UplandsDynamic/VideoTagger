@@ -2,7 +2,7 @@
 
 Full README, with usage instructions, available in the README.rst, here:
 
-https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst
+https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/README.rst
 
 # Brief Overview
 

@@ -1,1 +1,1 @@
-../VERSION.rst
+0.3

@@ -8,10 +8,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from .video_players import VideoPlayer, VideoPlayers
 from . import engine_room
+from VideoTagger.__init__ import PROJECT_ROOT
 
 
 class VideoTagger:
-    PROJECT_ROOT = engine_room.PROJECT_ROOT
+    PROJECT_ROOT = PROJECT_ROOT
     # control buttons
     PLAY = 'Play the video'
     STOP = 'Stop the video'
@@ -38,24 +39,24 @@ class VideoTagger:
             engine_room.Engine.make_config_dir(path='{}/.config/video_tagger'.format(user_home))
 
         # set version number from file
-        with open('{}/VERSION.rst'.format(self.PROJECT_ROOT)) as in_file:
+        with open('{}VideoTagger/VERSION.rst'.format(self.PROJECT_ROOT)) as in_file:
             self.app_version = engine_room.sanitize_filter(in_file.read())[0:7]
 
         # set license from file
-        with open('{}/LICENSE.txt'.format(self.PROJECT_ROOT)) as in_file:
+        with open('{}VideoTagger/LICENSE.txt'.format(self.PROJECT_ROOT)) as in_file:
             self.license_text = in_file.read()
 
         # set short description from file
-        with open('{}/SHORT_DESCRIPTION.txt'.format(self.PROJECT_ROOT)) as in_file:
+        with open('{}VideoTagger/SHORT_DESCRIPTION.txt'.format(self.PROJECT_ROOT)) as in_file:
             self.short_desc = in_file.read()
 
         # set manual from file
-        with open('{}/MANUAL.txt'.format(self.PROJECT_ROOT)) as in_file:
+        with open('{}VideoTagger/MANUAL.txt'.format(self.PROJECT_ROOT)) as in_file:
             self.manual = in_file.read()
 
         ''' GLADE '''
         # # # # # # # TOP LEVEL GLADE SETUP
-        self.glade_file = '{}/resources/videotagger.glade'.format(self.PROJECT_ROOT)
+        self.glade_file = '{}/VideoTagger/resources/videotagger.glade'.format(self.PROJECT_ROOT)
         # create builder and add the glade file
         self.builder = Gtk.Builder()
         self.builder.add_from_file(self.glade_file)
