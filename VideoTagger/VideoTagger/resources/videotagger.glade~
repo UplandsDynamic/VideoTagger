@@ -31,7 +31,7 @@
     <property name="text" translatable="yes">Usage ...</property>
   </object>
   <object class="GtkAdjustment" id="mpv_seek_adjustment">
-    <property name="upper">100</property>
+    <property name="upper">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
     <signal name="value-changed" handler="on_adjustment_changed" swapped="no"/>
@@ -528,9 +528,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="adjustment">mpv_seek_adjustment</property>
+                <property name="show_fill_level">True</property>
                 <property name="restrict_to_fill_level">False</property>
-                <property name="round_digits">2</property>
-                <property name="digits">2</property>
+                <property name="round_digits">1</property>
+                <property name="has_origin">False</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -572,7 +573,7 @@
 This applications creates timestamped notes for video clips.
 
 Hit the buttons below for further blub.</property>
-    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/README.rst</property>
+    <property name="website">https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/README.rst</property>
     <property name="website_label" translatable="yes">
 Further Information (web)
 </property>

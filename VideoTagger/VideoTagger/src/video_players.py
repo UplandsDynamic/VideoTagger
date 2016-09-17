@@ -114,7 +114,8 @@ class VideoPlayer:
         # run in own thread so doesn't block whilst looping until mpv returns value
         for attempt in range(61):
             if self.get_time_remaining():
-                self.video_length = self.get_time_remaining()
+                # set, in mins
+                self.video_length = self.get_time_remaining() / 60
                 # log it
                 self.logger('info', 'cplayer', 'Video length set as: {}'.format(
                     str(self.get_time_remaining())))
@@ -132,12 +133,15 @@ class VideoPlayer:
 
     def set_video_position(self, pos):
         print('Now playing at {:.2f}s'.format(pos))
-        self.pos = pos
+        # display in mins
+        self.pos = pos / 60
         # set the progress slider position
-        self.progress_slider.set_value(pos)
+        self.progress_slider.set_value(self.pos)
 
-    def change_video_position(self, pos):
-        self.mpv._set_property('time-pos', pos)
+    def change_video_position(self, mins):
+        # convert back to secs (rounded to 1/10th) for mpv
+        secs = round((mins * 60), 1)
+        self.mpv._set_property('time-pos', secs)
 
     def set_notes_dir_callback(self, notes_directory):
         # set the directory attribute
