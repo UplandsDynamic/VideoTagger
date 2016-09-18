@@ -304,8 +304,6 @@
   </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="name">VideoTagger</property>
-    <property name="width_request">800</property>
-    <property name="height_request">600</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">VideoTagger</property>
     <property name="default_width">800</property>
@@ -416,24 +414,86 @@
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="row_spacing">1</property>
-            <property name="column_spacing">1</property>
+            <property name="margin_left">3</property>
+            <property name="margin_right">3</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+            <property name="row_spacing">3</property>
+            <property name="column_spacing">3</property>
             <property name="row_homogeneous">True</property>
             <property name="column_homogeneous">True</property>
             <child>
-              <object class="GtkButton" id="take_note_button">
-                <property name="label" translatable="yes">Take Note</property>
+              <object class="GtkButton" id="seek_back_button">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">take_note_icon</property>
+                <property name="image">back_button_icon</property>
+                <property name="always_show_image">True</property>
+                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="start_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="image">play_button_icon</property>
                 <property name="image_position">right</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="stop_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="image">stop_button_icon</property>
+                <property name="image_position">right</property>
+                <property name="always_show_image">True</property>
+                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="pause_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="image">pause_button_icon</property>
+                <property name="image_position">right</property>
+                <property name="always_show_image">True</property>
+                <signal name="toggled" handler="on_button_toggled" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left_attach">3</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="seek_forward_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="image">forward_button_icon</property>
+                <property name="image_position">right</property>
+                <property name="always_show_image">True</property>
+                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left_attach">4</property>
+                <property name="top_attach">0</property>
               </packing>
             </child>
             <child>
@@ -449,29 +509,16 @@
               </object>
               <packing>
                 <property name="left_attach">0</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="seek_back_button">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">back_button_icon</property>
-                <property name="always_show_image">True</property>
-                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
                 <property name="top_attach">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="start_button">
+              <object class="GtkButton" id="take_note_button">
+                <property name="label" translatable="yes">Take Note</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">play_button_icon</property>
+                <property name="image">take_note_icon</property>
                 <property name="image_position">right</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_button_clicked" swapped="no"/>
@@ -479,67 +526,6 @@
               <packing>
                 <property name="left_attach">1</property>
                 <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="stop_button">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">stop_button_icon</property>
-                <property name="image_position">right</property>
-                <property name="always_show_image">True</property>
-                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="pause_button">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">pause_button_icon</property>
-                <property name="image_position">right</property>
-                <property name="always_show_image">True</property>
-                <signal name="toggled" handler="on_button_toggled" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="seek_forward_button">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">forward_button_icon</property>
-                <property name="image_position">right</property>
-                <property name="always_show_image">True</property>
-                <signal name="clicked" handler="on_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">4</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkScale" id="mpv_seek_scale">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="adjustment">mpv_seek_adjustment</property>
-                <property name="show_fill_level">True</property>
-                <property name="restrict_to_fill_level">False</property>
-                <property name="round_digits">1</property>
-                <property name="has_origin">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-                <property name="width">5</property>
               </packing>
             </child>
             <child>
@@ -555,6 +541,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="padding">3</property>
             <property name="position">3</property>
           </packing>
         </child>

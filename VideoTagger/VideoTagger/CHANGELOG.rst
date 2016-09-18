@@ -1,5 +1,11 @@
 ============
-Version 0.2
+Version 0.4
+============
+
+- Replaced GUI version slider with implementation of MPV OSC (lua)
+
+============
+Version 0.3
 ============
 
 - Added About dialog

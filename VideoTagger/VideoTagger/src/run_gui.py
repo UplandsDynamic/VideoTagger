@@ -27,7 +27,6 @@ class VideoTagger:
     GET_NOTES_DIR = 'Gets the currently selected notes directory for the player'
     SET_NOTES_DIR = 'Callback to set the player notes directory'
     MAKE_CONFIG_DIR = False  # Unnecessary for now ...
-    GET_PROGRESS_SLIDER_STATE = 'Gets progress slider for selected video'
     SEEK_TO = 'Seeks to position in video stream'
     GET_POSITION = 'Gets current video position in stream'
 
@@ -392,10 +391,8 @@ class VideoTagger:
                     player_instance.set_notes_dir_callback(notes_directory=kwargs.get('notes_directory'))
                 elif action is self.GEN_NOTE:
                     return player_instance.gen_note()
-                elif action is self.GET_PROGRESS_SLIDER_STATE:
-                    player_instance.get_progress_slider_state()
                 elif action is self.SEEK_TO:
-                    player_instance.change_video_position(self.mpv_seek_adjustment.get_value())
+                    player_instance.set_new_video_position(new_position_secs=kwargs.get('new_pos_secs'))
                 elif action is self.GET_POSITION:
                     return player_instance.get_video_position()
             else:
