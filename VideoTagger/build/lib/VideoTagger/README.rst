@@ -47,22 +47,9 @@ https://github.com/ZWS2014/VideoTagger/blob/master/VideoTagger/VideoTagger/VERSI
 **Availabilty**
 ---------------
 
-This application is available for Arch Linux, from the Arch User Repository (AUR). Installing from the AUR
-pulls the latest stable version from github/master. The AUR page is here:
-
-https://aur.archlinux.org/packages/videotagger
-
-"Snap" packages for other Linux distributions, and a FreeBSD port, may be available in due course.
-
 The source code is published on GitHub, here:
 
 https://github.com/ZWS2014/VideoTagger
-
-The application is also available as a Python package, which may be installed on many platforms, from PyPi.
-
-However, only major version changes are published to PyPi. The PyPi repository is here:
-
-https://pypi.python.org/pypi/VideoTagger
 
 -----------
 **License**

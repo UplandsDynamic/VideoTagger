@@ -4,6 +4,7 @@ from . import engine_room
 import _thread
 import time
 
+
 class VideoPlayers:
     def __init__(self, treestore=None, slider=None):
         self.video_players = {}
@@ -61,10 +62,11 @@ class VideoPlayer:
         self.source = source
 
         self.mpv = mpv.MPV('input-vo-keyboard',
-                        log_handler=self.logger,
+                           log_handler=self.logger,
                            ytdl=True,
                            input_default_bindings=True,
-                           input_vo_keyboard=True)
+                           input_vo_keyboard=True,
+                           cache=100000)
         # generate a new ID when new player is initialised
         self.player_id = self.generate_new_id()
         # add the PRIMARY VIDEO PLAYER ROW to the treestore for display. See self.play() for child row defs.
@@ -114,7 +116,8 @@ class VideoPlayer:
         # run in own thread so doesn't block whilst looping until mpv returns value
         for attempt in range(61):
             if self.get_time_remaining():
-                self.video_length = self.get_time_remaining()
+                # set, in mins
+                self.video_length = self.get_time_remaining() / 60
                 # log it
                 self.logger('info', 'cplayer', 'Video length set as: {}'.format(
                     str(self.get_time_remaining())))
@@ -132,12 +135,20 @@ class VideoPlayer:
 
     def set_video_position(self, pos):
         print('Now playing at {:.2f}s'.format(pos))
-        self.pos = pos
+        # display in mins
+        self.pos = pos / 60
         # set the progress slider position
-        self.progress_slider.set_value(pos)
+        existing_pos = self.progress_slider.get_value()
+        try:
+            self.progress_slider.set_value(self.pos)
+        except Exception as e:
+            self.logger('error', 'cplayer', str(e))
+            self.progress_slider.set_value(existing_pos)
 
-    def change_video_position(self, pos):
-        self.mpv._set_property('time-pos', pos)
+    def change_video_position(self, mins):
+        # convert back to secs (rounded to 1/10th) for mpv
+        secs = round((mins * 60), 1)
+        self.mpv._set_property('time-pos', secs)
 
     def set_notes_dir_callback(self, notes_directory):
         # set the directory attribute
@@ -242,8 +253,8 @@ class VideoPlayer:
         self.mpv.loop = 'no'
         # Option access, in general these require the core to reinitialize
         self.mpv['vo'] = 'opengl'
-        # set seek hr-seek to yes, to be precise rather than nearest keyframe when possible
-        self.mpv._set_property(name='hr-seek', value='yes', proptype=str)
+        # set seek hr-seek
+        self.mpv._set_property(name='hr-seek', value='no', proptype=str)
         # start with osd on, at level 3
         self.mpv._set_property(name='osd-level', value=3, proptype=int)
         # mute

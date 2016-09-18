@@ -200,10 +200,10 @@ class VideoTagger:
 
     def on_adjustment_changed(self, widget):
         if widget == self.mpv_seek_adjustment:
-            # seek to slider position if slider moved more than 5 seconds from current
+            # seek to slider position if slider moved more than n seconds from current
             current_pos = self.player_interface(action=self.GET_POSITION)
             moved_pos = self.mpv_seek_adjustment.get_value()
-            if current_pos and (moved_pos < current_pos - 5 or moved_pos > current_pos + 5):
+            if current_pos and (moved_pos < current_pos - 0.1 or moved_pos > current_pos + 0.1):
                 self.player_interface(action=self.SEEK_TO)
 
     # # # FILE CHOOSER WIDGET
@@ -343,7 +343,7 @@ class VideoTagger:
         if action is self.PLAY:
             # restrict to one video at a time until refactor for better multi solution
             if player_instance:
-                player_instance.stop()
+                pass
             if self.video_source.get_text():
                 # create a new player
                 new_player_instance = VideoPlayer(source=engine_room.source_filter(
