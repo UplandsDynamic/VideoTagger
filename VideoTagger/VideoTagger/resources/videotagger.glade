@@ -49,9 +49,9 @@
     <property name="margin_right">7</property>
     <property name="margin_top">7</property>
     <property name="margin_bottom">7</property>
+    <property name="border_width">7</property>
     <property name="row_spacing">3</property>
     <property name="column_spacing">3</property>
-    <property name="column_homogeneous">True</property>
     <child>
       <object class="GtkButton" id="notes_dir_button">
         <property name="visible">True</property>
@@ -166,76 +166,6 @@
       </packing>
     </child>
     <child>
-      <object class="GtkScrolledWindow" id="notes_scroller">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hexpand">True</property>
-        <property name="vexpand">True</property>
-        <property name="shadow_type">in</property>
-        <child>
-          <object class="GtkViewport">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <child>
-              <object class="GtkBox" id="note_box">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <child>
-                  <object class="GtkLabel" id="note_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="valign">start</property>
-                    <property name="margin_left">3</property>
-                    <property name="margin_right">3</property>
-                    <property name="margin_top">3</property>
-                    <property name="margin_bottom">3</property>
-                    <property name="label" translatable="yes">Enter note here: </property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkBox" id="note_data_box">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="valign">start</property>
-                    <property name="margin_left">3</property>
-                    <property name="margin_right">3</property>
-                    <property name="margin_top">3</property>
-                    <property name="margin_bottom">3</property>
-                    <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="left_attach">0</property>
-        <property name="top_attach">4</property>
-        <property name="width">4</property>
-        <property name="height">2</property>
-      </packing>
-    </child>
-    <child>
       <object class="GtkLabel" id="timestamp_header">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -264,6 +194,72 @@
         <property name="left_attach">1</property>
         <property name="top_attach">3</property>
         <property name="width">3</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow" id="notes_scroller">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="shadow_type">in</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <child>
+              <object class="GtkBox" id="note_box">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="valign">start</property>
+                    <property name="margin_top">3</property>
+                    <property name="margin_bottom">3</property>
+                    <property name="stock">gtk-edit</property>
+                    <property name="icon_size">6</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="note_data_box">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="valign">start</property>
+                    <property name="margin_top">3</property>
+                    <property name="margin_bottom">3</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">4</property>
+        <property name="width">4</property>
+        <property name="height">3</property>
       </packing>
     </child>
   </object>

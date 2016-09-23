@@ -5,9 +5,9 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk, Pango
 from .video_players import VideoPlayer, VideoPlayers
-from . import engine_room
+from . import machine
 from VideoTagger.__init__ import PROJECT_ROOT
 
 
@@ -35,11 +35,11 @@ class VideoTagger:
         # if MAKE_CONFIG_DIR set, make the config directory if does not exist
         if self.MAKE_CONFIG_DIR:
             user_home = os.getenv('USERPROFILE') or os.getenv('HOME')
-            engine_room.Engine.make_config_dir(path='{}/.config/video_tagger'.format(user_home))
+            machine.Setup.make_config_dir(path='{}/.config/video_tagger'.format(user_home))
 
         # set version number from file
         with open('{}VideoTagger/VERSION.rst'.format(self.PROJECT_ROOT)) as in_file:
-            self.app_version = engine_room.sanitize_filter(in_file.read())[0:7]
+            self.app_version = machine.sanitize_filter(in_file.read())[0:7]
 
         # set license from file
         with open('{}VideoTagger/LICENSE.txt'.format(self.PROJECT_ROOT)) as in_file:
@@ -281,6 +281,8 @@ class VideoTagger:
                 note_tv.set_halign(Gtk.Align.START)
                 note_tv_buff = note_tv.get_buffer()
                 note_tv_buff.set_text(note_data.get('Note') or '')
+                start, end = note_tv_buff.get_bounds()
+                note_tv_buff.place_cursor(end)
                 note_box.pack_start(note_tv, True, True, 0)
                 note_data_box.pack_start(note_box, True, True, 0)
                 # get ref to dialog's content area
@@ -326,8 +328,6 @@ class VideoTagger:
         self.selected_video_player_id = model.get_value(model.get_iter(player_id_treepath), 1)
         # get pause button state
         self.player_interface(action=self.GET_PAUSE_BUTTON_STATE)
-        # set progress slider state to the selected video
-        self.player_interface(action=self.GET_PROGRESS_SLIDER_STATE)
 
     # # # PLAYER INTERFACE
 
@@ -345,7 +345,7 @@ class VideoTagger:
                 pass
             if self.video_source.get_text():
                 # create a new player
-                new_player_instance = VideoPlayer(source=engine_room.source_filter(
+                new_player_instance = VideoPlayer(source=machine.source_filter(
                     self.video_source.get_text()),
                     video_players_group=self.video_players)
                 # register the player

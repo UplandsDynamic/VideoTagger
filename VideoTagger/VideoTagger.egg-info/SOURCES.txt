@@ -26,6 +26,6 @@ VideoTagger/resources/videotagger_icon_512x512.png
 VideoTagger/resources/videotagger_with_progbar.glade
 VideoTagger/resources/videotagger_with_progbar.glade~
 VideoTagger/src/__init__.py
-VideoTagger/src/engine_room.py
-VideoTagger/src/run_gui.py
+VideoTagger/src/machine.py
+VideoTagger/src/run.py
 VideoTagger/src/video_players.py

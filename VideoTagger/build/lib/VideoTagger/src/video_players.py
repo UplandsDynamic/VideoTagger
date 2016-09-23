@@ -1,6 +1,6 @@
 import random
 import python_mpv_zws as mpv
-from . import engine_room
+from . import machine
 import _thread
 import time
 
@@ -71,7 +71,7 @@ class VideoPlayer:
                                   osc='yes'
                                   )
         # generate a new ID when new player is initialised
-        self.player_id = self.generate_new_id()
+        self.player_id = machine.generate_new_id()
         # add the PRIMARY VIDEO PLAYER ROW to the treestore for display. See self.play() for child row defs.
         self.treestore_id_field = self.video_players_group.treestore.prepend(
             None, ['Video Player ID', self.player_id])
@@ -141,20 +141,19 @@ class VideoPlayer:
 
     def set_notes_dir_callback(self, notes_directory):
         # set the directory attribute
-        self.notes_dir = engine_room.sanitize_filter(notes_directory)
+        self.notes_dir = machine.sanitize_filter(notes_directory)
         # update the treestore
         self.video_players_group.treestore.set_value(
             self.treestore_note_location_field, 1, self.notes_dir)
         return True
-
 
     ''' GETTERS '''
 
     def get_player_state(self):
         try:
             # check and set ACTUAL mpv instance state for paused
-            self.set_player_state(self.PAUSED) if self.mpv_player._get_property(name='pause', proptype=bool) \
-                                                  is True else self.set_player_state(self.PLAYING)
+            self.set_player_state(self.PAUSED) if self.mpv_player._get_property(
+                name='pause', proptype=bool) is True else self.set_player_state(self.PLAYING)
         except AttributeError:
             pass  # player probably stopped, hence mpv object no longer exists
         return self.state
@@ -201,22 +200,24 @@ class VideoPlayer:
 
     def save_note(self, note):
         if note:
-            if engine_room.NoteMachine.save_note(notes_dir=self.notes_dir,
-                                                 video_title=note.get('video_title'),
-                                                 video_source=note.get('video_source'),
-                                                 video_timestamp=note.get('timestamp'),
-                                                 note=note.get('note_data')
-                                                 ):
+            if machine.NoteMachine.save_note(notes_dir=self.notes_dir,
+                                             video_title=note.get('video_title'),
+                                             video_source=note.get('video_source'),
+                                             video_timestamp=note.get('timestamp'),
+                                             note=note.get('note_data')
+                                             ):
                 self.logger('info', 'note', 'Note taken!')
                 return True
         self.logger('error', 'note', 'Error: Note not taken!')
 
     def gen_note(self):
+        # seconds formatted to mins, secs (to 10ths)
+        timestamp = machine.secs_to_minsec(self.mpv_player._get_property('time-pos'))
         return {'Note': '',
-                'Timestamp': self.mpv_player._get_property('time-pos'),
+                'Timestamp': '{} min, {} sec'.format(timestamp['min'], timestamp['sec']),
                 'Video Source': self.source,
-                'Video Title': engine_room.title_formatter(self.video_players_group.treestore.get_value(
-                    self.treestore_title_field, 1))} or self.logger(
+                'Video Title': self.video_players_group.treestore.get_value(
+                    self.treestore_title_field, 1)} or self.logger(
             'error', 'note', 'There was an error opening the note file!')
 
     def play(self):
@@ -266,8 +267,8 @@ class VideoPlayer:
             # observe title (set to change in realtime when updated)
             self.mpv_player.observe_property('media-title',
                                              lambda text: self.video_players_group.treestore.set_value(
-                                          self.treestore_title_field, 1, '{}'.format(text)) if text
-                                      else None)
+                                                 self.treestore_title_field, 1, '{}'.format(text)) if text
+                                             else None)
             print('Starting player with ID: {}'.format(self.get_player_id()))
         else:
             self.logger('error', 'cplayer', 'No source, there is no source, where is my source?!')
@@ -312,11 +313,3 @@ class VideoPlayer:
             self.mpv_player._set_property(name='osd-level', value=3, proptype=int)
         else:
             self.mpv_player._set_property(name='osd-level', value=0, proptype=int)
-
-    @staticmethod
-    def generate_new_id():
-        ran = random.randrange(10 ** 80)
-        hex = "%064x" % ran
-        # limit string to 32 characters (default 64)
-        hex = hex[:32]
-        return hex
