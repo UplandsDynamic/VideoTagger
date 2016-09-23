@@ -6,4 +6,4 @@ It acts as an interface to control the excellent Open Source MPV player.
 
 For further information, visit the project's GitHub page at: https://github.com/ZWS2014/VideoTagger
 
-Bugs & feature requests welcome!
+Bug reports & feature requests welcome!
