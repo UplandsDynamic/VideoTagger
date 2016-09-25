@@ -31,13 +31,21 @@ class NoteMachine:
     def save_note(notes_dir, video_title, video_source, video_timestamp, note, save_type=SAVE_TYPE_YAML):
         if save_type is SAVE_TYPE_YAML:
             try:
+                # ensure permission to open file if already exists
+                try:
+                    os.chmod('{}/{}.yaml'.format(notes_dir, title_to_filename(video_title)), 0o644)
+                except FileNotFoundError:
+                    pass
                 with open('{}/{}.yaml'.format(notes_dir, title_to_filename(video_title)), 'a') as f:
                     # write the file
-                    dump([{'Timestamp: {}'.format(video_timestamp):
-                               [{'Video Source': video_source},
+                    dump([{'Note':
+                               [{'Timestamp': video_timestamp},
+                                {'Video Source': video_source},
                                 {'Video Title': video_title},
                                 {'Note': '\n{}\n'.format(note)}, ]}], f,
                          Dumper=Dumper, default_flow_style=False, explicit_start=False)
+                # change permissions on the file to r/o
+                os.chmod('{}/{}.yaml'.format(notes_dir, title_to_filename(video_title)), 0o444)
                 return True
             except Exception as e:
                 print('There was an error saving the note: {}'.format(e))
@@ -46,18 +54,37 @@ class NoteMachine:
         return False
 
     @staticmethod
-    def get_note():
-        # ToDo ... retrieve notes for reader functionality ...
-        ''' EXAMPLE:
+    def get_note(notes_file, save_type=SAVE_TYPE_YAML):
         if save_type is SAVE_TYPE_YAML:
             try:
-                with open('{}/{}.yaml'.format(notes_dir, title_formatter(video_title)), 'r') as f:
-                    data = load(f, Loader=Loader)
+                with open(notes_file, 'r') as f:
+                    return load(f, Loader=Loader, )
             except FileNotFoundError:
-                pass  # do something if file not found
-        '''
-        pass
+                pass
+        return None
 
+    @staticmethod
+    def edit_notes(notes_file):
+        if notes_file:
+            return NoteMachine.get_note(notes_file=notes_file)
+        return None
+
+    @staticmethod
+    def save_edit(notes_filename, notes_dir, note_data, save_type=SAVE_TYPE_YAML):
+        if save_type is SAVE_TYPE_YAML:
+            try:
+                os.chmod('{}/{}'.format(notes_dir, notes_filename), 0o644)
+                with open('{}/{}'.format(notes_dir, notes_filename), 'w') as f:
+                    # write the file
+                    dump(note_data, f,
+                         Dumper=Dumper, default_flow_style=False, explicit_start=False)
+                os.chmod('{}/{}'.format(notes_dir, notes_filename), 0o444)
+                return True
+            except Exception as e:
+                print('There was an error saving the note: {}'.format(e))
+        else:
+            print('This save type is not currently supported.')
+        return False
 
 ''' HELPERS '''
 

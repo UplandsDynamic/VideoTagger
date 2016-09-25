@@ -29,6 +29,7 @@ class VideoTagger:
     MAKE_CONFIG_DIR = False  # Unnecessary for now ...
     SEEK_TO = 'Seeks to position in video stream'
     GET_POSITION = 'Gets current video position in stream'
+    READ_EDIT_NOTE = 'Opens note editor'
 
     def __init__(self):
 
@@ -52,6 +53,16 @@ class VideoTagger:
         # set manual from file
         with open('{}VideoTagger/MANUAL.txt'.format(self.PROJECT_ROOT)) as in_file:
             self.manual = in_file.read()
+
+        # set custom css styling
+        self.style_provider = Gtk.CssProvider()
+        self.style_provider.load_from_path('{}VideoTagger/resources/videotagger.css'.format(
+            self.PROJECT_ROOT))
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            self.style_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
         ''' GLADE '''
         # # # # # # # TOP LEVEL GLADE SETUP
@@ -78,6 +89,7 @@ class VideoTagger:
         self.select_dir_button = self.builder.get_object('notes_dir_button')
         self.about_blurb_button = self.builder.get_object('about_blurb_button')
         self.usage_button = self.builder.get_object('usage_button')
+        self.edit_notes_button = self.builder.get_object('edit_notes_button')
         # edit texts
         self.video_source = self.builder.get_object('video_source')
         # grids
@@ -130,6 +142,15 @@ class VideoTagger:
         # # # SELECTION REFERENCES
         self.selected_video_player_id = None
         self.selected_video_player_notes = None
+        self.notes_file = None
+        self.selected_note_row = None
+
+        # # # NOTE EDIT DIALOG TEXTVIEW
+        self.note_edit_panel = Gtk.TextView()
+        self.note_edit_panel.set_left_margin(7)
+        self.note_edit_panel.set_right_margin(7)
+        self.note_edit_panel.set_top_margin(7)
+        self.note_edit_panel.set_bottom_margin(7)
 
         # # # # # # # SHOW THE MAIN WINDOW
         print('Showing window ...')
@@ -189,6 +210,8 @@ class VideoTagger:
             self.info_dialog_show(self.short_desc)
         if button == self.usage_button:
             self.info_dialog_show(self.manual)
+        if button == self.edit_notes_button:
+            self.on_edit_notes_clicked()
 
     def on_button_toggled(self, button):
         if button == self.pause_button:
@@ -205,14 +228,13 @@ class VideoTagger:
             if current_pos and (moved_pos < current_pos - 0.1 or moved_pos > current_pos + 0.1):
                 self.player_interface(action=self.SEEK_TO)
 
-    # # # FILE CHOOSER WIDGET
+    # # # FILE CHOOSER WIDGETS
 
     def filechooser_dialog(self):
         dialog = Gtk.FileChooserDialog('Select or Create Notes Directory', self.window,
                                        Gtk.FileChooserAction.SELECT_FOLDER,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         'Select', Gtk.ResponseType.OK))
-        # self.add_filters(dialog)  # just for files, not directory
         dialog.set_default_size(800, 400)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -222,7 +244,22 @@ class VideoTagger:
             print('CANCEL CLICKED!')
         dialog.destroy()
 
-    def add_filters(self, dialog):
+    def notes_filechooser_dialog(self):
+        dialog = Gtk.FileChooserDialog('Select a notes file to read or edit', self.window,
+                                       Gtk.FileChooserAction.OPEN,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        'Select', Gtk.ResponseType.OK))
+        self.notes_filechooser_dialog_add_filters(dialog)  # just for files, not directory
+        dialog.set_default_size(800, 400)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            # send to the callback
+            self.notes_file = dialog.get_filename()
+        elif response == Gtk.ResponseType.CANCEL:
+            print('CANCEL CLICKED!')
+        dialog.destroy()
+
+    def notes_filechooser_dialog_add_filters(self, dialog):
         filter_text = Gtk.FileFilter()
         filter_text.set_name("YAML Files")
         filter_text.add_pattern('*.yaml')
@@ -259,7 +296,7 @@ class VideoTagger:
                 self.filechooser_dialog()
             notes_dir = self.player_interface(action=self.GET_NOTES_DIR)
             if notes_dir:
-                # get the existing note data
+                # get the pre-populated note data
                 note_data = self.player_interface(action=self.GEN_NOTE)  # dict returned
                 # set fields
                 notes_dir_field.set_text(notes_dir)
@@ -279,6 +316,7 @@ class VideoTagger:
                 note_tv.set_wrap_mode(Gtk.WrapMode.WORD)
                 note_tv.set_editable(True)
                 note_tv.set_halign(Gtk.Align.START)
+                note_tv.set_hexpand(True)
                 note_tv_buff = note_tv.get_buffer()
                 note_tv_buff.set_text(note_data.get('Note') or '')
                 start, end = note_tv_buff.get_bounds()
@@ -316,6 +354,130 @@ class VideoTagger:
             self.player_interface(self.GET_PAUSE_BUTTON_STATE)
         else:
             print("No, it ain't a player!")
+
+    # # # NOTE READER & EDITOR DIALOG
+
+    def on_edit_notes_clicked(self):
+        if self.selected_video_player_id:
+            # pause the vid
+            self.player_interface(action=self.PAUSE)
+        # raise dialog
+        dialog = Gtk.Dialog("Note Editor", self.window, 0,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                             'Save Note', Gtk.ResponseType.OK))
+        dialog.set_default_size(800, 600)
+        dialog.set_modal(False)
+        # select the notes file
+        self.notes_filechooser_dialog()
+        if self.notes_file:
+            note_data = machine.NoteMachine.edit_notes(notes_file=self.notes_file)
+            notes_dir = '/'.join(self.notes_file.split('/')[0:-1])  # gets path minus filename
+            notes_filename = self.notes_file.split('/')[-1]
+            main_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=7)
+            current_notes_container = Gtk.ScrolledWindow()
+            current_notes_container.set_size_request(400, 0)
+            # create treestore
+            ts = Gtk.TreeStore(str)
+            # define field column
+            tv_value_col = Gtk.TreeViewColumn()
+            # set tooltipped title
+            tv_value_col_header = Gtk.Label()
+            tv_value_col_header.show()
+            tv_value_col.set_widget(tv_value_col_header)
+            tv_value_col_header.set_tooltip_text('Click to sort by timestamp')
+            # define cell renderer
+            tv_value_cell = Gtk.CellRendererText()
+            tv_value_cell.set_fixed_size(-1, -1)
+            tv_value_col.pack_start(tv_value_cell, expand=True)
+            tv_value_col.add_attribute(tv_value_cell, 'text', 0)
+            tv_value_col.set_sort_column_id(0)
+
+            # define holding variables
+            timestamp_field = None
+            note_position_marker = {}
+            # iterate note_data & extract values
+            for note_pos, n in enumerate(note_data):
+                for item_pos, item in enumerate(n['Note']):
+                    if 'Timestamp' in item:
+                        timestamp_field = ts.append(None, ['Timestamp: {}'.format(item['Timestamp'])])
+                    if 'Note' in item:
+                        note_field = ts.append(timestamp_field, [item['Note']])
+                        ''' create dict with note_pos as key & item_pos as value.
+                        note_pos will be same as treestore row, retrieved when selected later.
+                        This is used to reconile selected note with it's position in the
+                        note_data dict, as is being iterated here, in order to overwrite
+                        that note in note_data dict '''
+                        note_position_marker[note_pos] = item_pos
+                    if 'Video Title' in item:
+                        tv_value_col_header.set_text('Notes For: {}'.format(item['Video Title']))
+            # auto sort by timestamp
+            sorted_ts = Gtk.TreeModelSort(ts)
+            sorted_ts.set_sort_column_id(0, Gtk.SortType.ASCENDING)
+            # create treeview (adding the now-sorted treestore)
+            tv = Gtk.TreeView(sorted_ts)
+            # add the columns to the treeview
+            tv.append_column(tv_value_col)
+            # define treeview properties
+            tv.set_reorderable(False)
+            tv.set_activate_on_single_click(True)
+            tv.set_grid_lines(True)
+            # connect action, when treeview row selected
+            tv.connect('row-activated', self.on_note_tv_activated)
+            # expand all by default
+            tv.expand_all()
+            # add treeview to the container
+            current_notes_container.add(tv)
+            # add to main container
+            main_container.pack_start(current_notes_container, False, False, 3)
+            # add note_textview to main container
+            main_container.set_homogeneous(False)
+            main_container.pack_start(self.note_edit_panel, True, True, 3)
+            # get ref to dialog's content area
+            content_area_box = dialog.get_content_area()
+            # add content grid to content area
+            content_area_box.pack_start(main_container, True, True, 3)
+            # content_area_box.pack_start(self.note_dialog_grid, True, True, 0)
+            # show content
+            dialog.show_all()
+            # run dialog
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                # save the note
+                buffer = self.note_edit_panel.get_buffer()
+                edited_text = buffer.get_text(*buffer.get_bounds(), False)
+                note_pos = self.selected_note_row
+                item_pos = note_position_marker[note_pos]
+                note_data[note_pos]['Note'][item_pos]['Note'] = edited_text
+                machine.NoteMachine.save_edit(notes_dir=notes_dir,
+                                              notes_filename=notes_filename,
+                                              note_data=note_data)
+                self.selected_note_row = None
+                buffer.set_text('')
+            elif response == Gtk.ResponseType.CANCEL:
+                print('Cancel clicked!')
+            # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
+            main_container.remove(self.note_edit_panel)
+        dialog.destroy()
+        if self.selected_video_player_id:
+            self.player_interface(action=self.RESUME)
+            # gets / sets pause state
+            self.player_interface(self.GET_PAUSE_BUTTON_STATE)
+
+    def on_note_tv_activated(self, widget, row, col):
+        # opens an edit dialog
+        model = widget.get_model()
+        # get value for note
+        note_path = str(Gtk.TreePath(row))
+        # if timestamp row clicked, display following note row in edit pane - not the timestamp
+        if ':0' not in note_path:
+            note_path += ':0'
+        # get the data to display in the pane from the note_path
+        display_data = model.get_value(model.get_iter(note_path), 0)
+        # set the selected row param
+        self.selected_note_row = row[0]
+        buffer = self.note_edit_panel.get_buffer()
+        # set the note text in the edit panel buffer
+        buffer.set_text(display_data.strip())
 
     # # # SET SELECTED VIDEO PLAYER ID (& PAUSE BUTTON STATE)
 

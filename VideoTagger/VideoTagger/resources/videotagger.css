@@ -1,0 +1,4 @@
+treeview.view {
+    -GtkTreeView-horizontal-separator: 25;
+    -GtkTreeView-expander-size:35;
+}
