@@ -10,11 +10,14 @@ Please note, this is a very early beta prototype.
 
 This is a GTK 3.x application that allows easy timestamped note taking for video clips.
 
-Clips may be played from local files, or streamed from remote sources such as YouTube.
-
 It acts as an interface to control the excellent Open Source MPV player, at: https://mpv.io/.
 
-The application depends on super Open Source project that provides Python bindings to the MPV
+Clips may be played from local files, or streamed from remote sources such as YouTube.
+
+Existing notes are stored as simple YAML files, which may be read and edited from within
+the application.
+
+The application depends on a super Open Source project that provides Python bindings to the MPV
 player, at: https://github.com/jaseg/python-mpv
 
 Notes are saved in a user nominated directory as YAML files. These are easily human

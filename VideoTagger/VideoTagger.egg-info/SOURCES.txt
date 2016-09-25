@@ -14,7 +14,9 @@ VideoTagger.egg-info/dependency_links.txt
 VideoTagger.egg-info/not-zip-safe
 VideoTagger.egg-info/requires.txt
 VideoTagger.egg-info/top_level.txt
+VideoTagger/resources/#videotagger.glade#
 VideoTagger/resources/default.png
+VideoTagger/resources/videotagger.css
 VideoTagger/resources/videotagger.desktop
 VideoTagger/resources/videotagger.glade
 VideoTagger/resources/videotagger.glade~
@@ -27,5 +29,5 @@ VideoTagger/resources/videotagger_with_progbar.glade
 VideoTagger/resources/videotagger_with_progbar.glade~
 VideoTagger/src/__init__.py
 VideoTagger/src/machine.py
-VideoTagger/src/run.py
+VideoTagger/src/ui.py
 VideoTagger/src/video_players.py
