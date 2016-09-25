@@ -1,9 +1,0 @@
-This is an application that creates timestamped notes for video clips.
-
-Clips may be played from local files, or streamed from remote sources such as YouTube.
-
-It acts as an interface to control the excellent Open Source MPV player.
-
-For further information, visit the project's GitHub page at: https://github.com/ZWS2014/VideoTagger
-
-Bug reports & feature requests welcome!

@@ -1,2 +1,0 @@
-python_mpv_zws
-PyYAML

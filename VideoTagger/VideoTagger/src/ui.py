@@ -436,7 +436,6 @@ class VideoTagger:
             content_area_box = dialog.get_content_area()
             # add content grid to content area
             content_area_box.pack_start(main_container, True, True, 3)
-            # content_area_box.pack_start(self.note_dialog_grid, True, True, 0)
             # show content
             dialog.show_all()
             # run dialog
@@ -455,6 +454,8 @@ class VideoTagger:
                 buffer.set_text('')
             elif response == Gtk.ResponseType.CANCEL:
                 print('Cancel clicked!')
+                self.selected_note_row = None
+                self.note_edit_panel.get_buffer().set_text('')
             # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
             main_container.remove(self.note_edit_panel)
         dialog.destroy()
