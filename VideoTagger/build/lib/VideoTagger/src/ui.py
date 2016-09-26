@@ -230,8 +230,9 @@ class VideoTagger:
 
     # # # FILE CHOOSER WIDGETS
 
-    def filechooser_dialog(self):
-        dialog = Gtk.FileChooserDialog('Select or Create Notes Directory', self.window,
+    def filechooser_dialog(self, attach=None):
+        attach = attach or self.window
+        dialog = Gtk.FileChooserDialog('Select or Create Notes Directory', attach,
                                        Gtk.FileChooserAction.SELECT_FOLDER,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         'Select', Gtk.ResponseType.OK))
@@ -244,8 +245,9 @@ class VideoTagger:
             print('CANCEL CLICKED!')
         dialog.destroy()
 
-    def notes_filechooser_dialog(self):
-        dialog = Gtk.FileChooserDialog('Select a notes file to read or edit', self.window,
+    def notes_filechooser_dialog(self, attach=None):
+        attach = attach or self.window
+        dialog = Gtk.FileChooserDialog('Select a notes file to read or edit', attach,
                                        Gtk.FileChooserAction.OPEN,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         'Select', Gtk.ResponseType.OK))
@@ -368,7 +370,7 @@ class VideoTagger:
         dialog.set_default_size(800, 600)
         dialog.set_modal(False)
         # select the notes file
-        self.notes_filechooser_dialog()
+        self.notes_filechooser_dialog(attach=dialog)
         if self.notes_file:
             note_data = machine.NoteMachine.edit_notes(notes_file=self.notes_file)
             notes_dir = '/'.join(self.notes_file.split('/')[0:-1])  # gets path minus filename
