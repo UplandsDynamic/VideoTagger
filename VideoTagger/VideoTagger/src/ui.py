@@ -452,12 +452,16 @@ class VideoTagger:
                 machine.NoteMachine.save_edit(notes_dir=notes_dir,
                                               notes_filename=notes_filename,
                                               note_data=note_data)
+                # cleanup
                 self.selected_note_row = None
+                self.notes_file = None
                 buffer.set_text('')
             elif response == Gtk.ResponseType.CANCEL:
                 print('Cancel clicked!')
+                # cleanup
                 self.selected_note_row = None
                 self.note_edit_panel.get_buffer().set_text('')
+                self.notes_file = None
             # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
             main_container.remove(self.note_edit_panel)
         dialog.destroy()
