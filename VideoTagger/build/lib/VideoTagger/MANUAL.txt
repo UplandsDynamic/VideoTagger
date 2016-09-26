@@ -1,0 +1,47 @@
+Basic Usage Instructions
+
+    * Type or paste a video file URL (either a local file, or remote) into the "Video Source" field.
+      Video files can also be dragged into this field - the source should automatically populate.
+
+    * Wait for the video to begin playing. The video should open in MPV player.
+
+    * A video session ID will appear in the main application window, which may be selected by a click.
+
+    * The video may be controlled via the application's control bar:
+
+      - Play button: Plays the video.
+
+      - Back button: Seeks back by 5 seconds (unit of time should be user definable in future versions).
+
+      - Stop button: Stops the video and destroys the instance. Only click this if you're done.
+
+      - Pause button: Pauses or resumes from a paused state.
+
+      - Forward button: Seeks forward by 5 seconds (unit of time should be user definable in future).
+
+      - "OSD" button: Toggles MPV's 'On Screen Display'.
+
+      - "Take Note" button: Tap this to take a note. This will pause the player and open up a timestamped
+        note. The user will also be prompted to select a directory in which to store the note if no
+        directory has already been defined.
+
+      - Users should be aware that clicking the Stop button will destroy the video session for that stream,
+        and so subsequent opening of the same video will require reselection of the storage directory.
+        Once the note has been taken (or cancelled), the player should automatically resume playing.
+
+    * Existing notes are stored as simple YAML files, which may be read and edited from within
+      the application as follows:
+
+      - Click "Read & Edit Notes" and select the notes file to edit from the file chooser dialog.
+        You will find the file saved in the directory you chose when making the note, in yaml format.
+        The filename should match the title of the video. Select the file and click "Select".
+
+      - A "Note Editor" dialog should now appear, presenting existing notes under their respective timestamps.
+
+          - Click on the large arrows to expand/compact the timestamps and expose/hide the attached note.
+
+          - To edit a note, click once on it's text to display in the editor pane (to the right).
+
+          - Edit the note in the editor pane, then click "Save Note".
+
+          - Job done! The notes file will now have been updated to reflect your changes.
