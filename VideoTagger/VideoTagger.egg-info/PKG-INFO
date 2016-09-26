@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: VideoTagger
-Version: 0.5.2.1
+Version: 0.5.3
 Summary: GTK 3.x research tool to take timestamped tags/notes of streamed or locally played video.Uses MPV player.
 Home-page: https://www.zaziork.com
 Author: Dan Bright
