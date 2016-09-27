@@ -66,7 +66,7 @@ class NoteMachine:
     @staticmethod
     def edit_notes(notes_file):
         if notes_file:
-            return NoteMachine.get_note(notes_file=notes_file)
+            return sort_by_timestamp(NoteMachine.get_note(notes_file=notes_file))
         return None
 
     @staticmethod
@@ -86,7 +86,19 @@ class NoteMachine:
             print('This save type is not currently supported.')
         return False
 
+
 ''' HELPERS '''
+
+
+def sort_by_timestamp(note_data):
+    timestamps = []
+    sorted_data = []
+    for i, d in enumerate(note_data):
+        timestamps.append((d['Note'][0]['Timestamp'], i))
+    timestamps.sort()
+    for i, d in enumerate(timestamps):
+        sorted_data.append(note_data[d[1]])
+    return sorted_data
 
 
 def title_to_filename(video_title):
