@@ -15,7 +15,7 @@ It acts as an interface to control the excellent Open Source MPV player, at: htt
 Clips may be played from local files, or streamed from remote sources such as YouTube.
 
 Existing notes are stored as simple YAML files, which may be read and edited from within
-the application.
+the application. Videos may be restarted at note's timestamp on the click of a button.
 
 The application depends on a super Open Source project that provides Python bindings to the MPV
 player, at: https://github.com/jaseg/python-mpv
@@ -55,14 +55,28 @@ The source code is published on GitHub, here:
 https://github.com/ZWS2014/VideoTagger
 
 -----------
-**License**
+**Contact**
 -----------
 
-Code author: Dan Bright
+- Primary Developer(s):
 
-Code author email: productions@zaziork.com
+  - Name: Dan Bright
 
-Code author website: https://www.zaziork.com
+    - Email: dan@aninstanceofme.com
+
+    - Website: https://www.zaziork.com
+
+Project Points of Contact:
+
+  - Web: https://github.com/ZWS2014/VideoTagger
+
+  - Email: productions@zaziork.com
+
+  - IRC: #VideoTagger channel on FreeNode
+
+-----------
+**License**
+-----------
 
 This application is made available under the GNU General Public License, Version 3.
 

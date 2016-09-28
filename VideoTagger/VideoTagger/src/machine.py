@@ -134,6 +134,12 @@ def secs_to_minsec(secs):
     return {'min': minutes, 'sec': seconds}
 
 
+def minsec_to_sec(minsec):
+    # takes minsec string in form "7 min, 3.5 sec" & returns seconds float
+    holder = minsec.split()
+    return (float(holder[0]) * 60) + float(holder[2])
+
+
 def generate_new_id():
     ran = random.randrange(10 ** 80)
     hex = "%064x" % ran

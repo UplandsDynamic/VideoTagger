@@ -42,6 +42,11 @@ Basic Usage Instructions
 
           - To edit a note, click once on it's text to display in the editor pane (to the right).
 
-          - Edit the note in the editor pane, then click "Save Note".
+          - Edit the note in the editor pane, then click "Save Note". Job done!
+          The notes file will now have been updated to reflect your changes.
 
-          - Job done! The notes file will now have been updated to reflect your changes.
+          - To begin playing a video source from a note timestamp, ensure a note is selected, then
+          click on the "Play Video" button. Any existing videos will close and a new MPV instance will
+          open to play the video source, starting 5 seconds before the timestamp. The 5 second difference
+          is to provide a lead-in context to the video clip (this setting may be user defined).
+

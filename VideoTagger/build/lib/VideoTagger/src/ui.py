@@ -191,7 +191,7 @@ class VideoTagger:
 
     # # # BUTTONS
 
-    def on_button_clicked(self, button):
+    def on_button_clicked(self, button, note_data=None):
         if button == self.start_button:
             self.player_interface(action=self.PLAY)
         if button == self.stop_button:
@@ -212,6 +212,8 @@ class VideoTagger:
             self.info_dialog_show(self.manual)
         if button == self.edit_notes_button:
             self.on_edit_notes_clicked()
+        if button.get_name() == 'edit_play_button':
+            self.on_edit_play(note_data=note_data)
 
     def on_button_toggled(self, button):
         if button == self.pause_button:
@@ -434,10 +436,13 @@ class VideoTagger:
             # add content grid to content area
             content_area_box.pack_start(main_container, True, True, 3)
             # add view video button to panel
-            # video_button = Gtk.Button('Play Video')
-            # action_area = dialog.get_action_area()
-            # action_area.pack_start(video_button, False, False, 3)
-            # action_area.reorder_child(video_button, 0)
+            video_button = Gtk.Button('Play Video')
+            video_button.set_name('edit_play_button')
+            action_area = dialog.get_action_area()
+            action_area.pack_start(video_button, False, False, 3)
+            action_area.reorder_child(video_button, 0)
+            # add video view button action
+            video_button.connect('clicked', self.on_button_clicked, note_data)
             # show content
             dialog.show_all()
             # run dialog
@@ -483,6 +488,21 @@ class VideoTagger:
         # set the note text in the edit panel buffer
         buffer.set_text(display_data.strip())
 
+    def on_edit_play(self, note_data):
+        timestamp = None
+        # close existing player, if any
+        if self.selected_video_player_id:
+            self.player_interface(action=self.STOP)
+        if note_data and self.selected_note_row is not None:
+            for d in note_data[self.selected_note_row]['Note']:
+                if 'Video Source' in d:
+                    self.video_source.set_text(d['Video Source'])
+                if 'Timestamp' in d:
+                    timestamp = d['Timestamp']
+            # start the player at the designated position
+            self.player_interface(action=self.PLAY,
+                                  start_position=machine.minsec_to_sec(timestamp))
+
     # # # SET SELECTED VIDEO PLAYER ID (& PAUSE BUTTON STATE)
 
     def on_treeview_row_activated(self, widget, row, col):
@@ -503,26 +523,26 @@ class VideoTagger:
     '''
 
     def player_interface(self, action=None, **kwargs):
-        # set existing player instance (if any)
-        player_instance = self.video_players.get_player(self.selected_video_player_id)
-        if action is self.PLAY:
-            # restrict to one video at a time until refactor for better multi solution
-            if player_instance:
-                pass
-            if self.video_source.get_text():
-                # create a new player
-                new_player_instance = VideoPlayer(source=machine.source_filter(
-                    self.video_source.get_text()),
-                    video_players_group=self.video_players)
-                # register the player
-                self.video_players.register_player(video_player=new_player_instance)
-                # play
-                new_player_instance.play()
-                # clear the url field for next one ..
-                self.video_source.set_text('')
-                # set current active player id to the newly created
-                self.selected_video_player_id = new_player_instance.get_player_id()
+        # check for existing player instances (and close if close_existing kwarg passed)
+        existing_player_ids = self.video_players.get_all_ids()
+        if not existing_player_ids:  # restrict to one player at a time (for now ...)
+            # set existing player instance (if any)
+            if action is self.PLAY:
+                if self.video_source.get_text():
+                    # get/set start position
+                    start_position = kwargs.get('start_position') or None
+                    # create a new player
+                    new_player_instance = VideoPlayer(source=machine.source_filter(
+                        self.video_source.get_text()),
+                        video_players_group=self.video_players)
+                    # register the player
+                    self.video_players.register_player(video_player=new_player_instance)
+                    # play
+                    new_player_instance.play(start_position=start_position)
+                    # set current active player id to the newly created
+                    self.selected_video_player_id = new_player_instance.get_player_id()
         else:
+            player_instance = self.video_players.get_player(self.selected_video_player_id)
             if player_instance:
                 if action is self.STOP:
                     player_instance.stop()
@@ -558,8 +578,10 @@ class VideoTagger:
                 elif action is self.GEN_NOTE:
                     return player_instance.gen_note()
                 elif action is self.SEEK_TO:
-                    player_instance.set_new_video_position(new_position_secs=kwargs.get('new_pos_secs'))
+                    pass  # define later as necessary ...
                 elif action is self.GET_POSITION:
                     return player_instance.get_video_position()
             else:
                 print("It ain't a player!")
+        # clear the url field for next one ..
+        self.video_source.set_text('')

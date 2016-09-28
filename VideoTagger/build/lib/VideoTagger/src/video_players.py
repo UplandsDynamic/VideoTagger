@@ -1,4 +1,3 @@
-import random
 import python_mpv_zws as mpv
 from . import machine
 import _thread
@@ -20,6 +19,9 @@ class VideoPlayers:
             return self.video_players[player_id]
         except KeyError:
             return None
+
+    def get_all_ids(self):
+        return [i.get_player_id() for i in self.video_players.values()]
 
     ''' SETTERS'''
 
@@ -82,9 +84,6 @@ class VideoPlayer:
         self.notes_dir = None
         self.note = None
         # timing
-        self.video_length = None
-        self.length_lock = False  # only allow length to be set once per video!
-        self.time_remaining = 0
         self.pos = 0
 
     ''' OBSERVERS '''
@@ -97,47 +96,17 @@ class VideoPlayer:
     #                                      lambda observed_value: self.set_time_remaining(
     #                                   observed_value=observed_value))
 
-    # def video_position_observer(self):  # UNNECESSARY TO OBSERVE AT PRESENT
-    #     self.mpv_player.observe_property('time-pos', lambda pos: self.set_current_video_position(pos))
+    def video_position_observer(self):
+        self.mpv_player.observe_property('time-pos', lambda pos: self.set_current_video_position(pos))
 
     ''' SETTERS '''
 
     def set_player_state(self, state):
         self.state = state
-        self.state = state
 
-    def set_time_remaining(self, observed_value):  # NOT USED AT PRESENT
-        self.time_remaining = observed_value
-
-    def set_video_length(self):
-        if not self.length_lock:  # only allow to be set ONCE for each video!
-            _thread.start_new_thread(self.video_length_setter, ())
-
-    def video_length_setter(self):
-        self.length_lock = True
-        # run in own thread so doesn't block whilst looping until mpv returns value
-        for attempt in range(61):
-            if self.get_time_remaining():
-                self.video_length = self.get_time_remaining()
-                # log it
-                self.logger('info', 'cplayer', 'Video length set as: {}'.format(
-                    str(self.get_time_remaining())))
-                return True  # ends the thread by returning True when value set
-            elif not self.get_time_remaining():
-                try:
-                    player = self.mpv_player  # check player still exists
-                    self.logger('info', 'cplayer', 'No video length retrieved yet ...')
-                    time.sleep(1)
-                except AttributeError:
-                    break
-        self.logger('error', 'cplayer', 'MVP did not return a valid video length')
-
-    def set_current_video_position(self, pos):  # NOT USED AT PRESENT
+    def set_current_video_position(self, pos):
         # sets pos param from observer method
         self.pos = pos
-
-    def set_new_video_position(self, new_pos_secs):  # USED FOR USER "SEEK TO" OPTION
-        self.mpv_player._set_property('time-pos', new_pos_secs)
 
     def set_notes_dir_callback(self, notes_directory):
         # set the directory attribute
@@ -160,12 +129,6 @@ class VideoPlayer:
 
     def get_player_id(self):
         return self.player_id
-
-    def get_time_remaining(self):
-        return self.time_remaining
-
-    def get_video_length(self):
-        return self.video_length
 
     def get_video_position(self):
         return self.pos
@@ -220,20 +183,22 @@ class VideoPlayer:
                     self.treestore_title_field, 1)} or self.logger(
             'error', 'note', 'There was an error opening the note file!')
 
-    def play(self):
+    def play(self, **kwargs):
         # define fullscreen
         self.mpv_player.fullscreen = False
         # define whether loops
         self.mpv_player.loop = 'no'
         # # # Option access, in general these require the core to reinitialize
         # set player video renderer
-        #self.mpv_player['vo'] = 'opengl'
+        # self.mpv_player['vo'] = 'opengl'
         # set seek hr-seek
         self.mpv_player._set_property(name='hr-seek', value='no', proptype=str)
         # start with osd on, at level 3
         self.mpv_player._set_property(name='osd-level', value=3, proptype=int)
         # start mute on/off
         self.mpv_player._set_property(name='mute', value=False, proptype=bool)
+        # kick off observers
+        self.video_position_observer()
 
         # custom key bindings
         def my_q_binding(state, key):
@@ -250,6 +215,9 @@ class VideoPlayer:
             # start video
             self.mpv_player.loadfile(filename=self.source, mode='replace')
             self.set_player_state(self.PLAYING)
+            # start from set position if necessary
+            if kwargs.get('start_position'):
+                _thread.start_new_thread(self.seek_to, (), {'pos': kwargs.get('start_position')})
             # # # DEFINE TREESTORE CHILDREN
             # set the displayed state
             self.treestore_state_field = self.video_players_group.treestore.append(
@@ -275,27 +243,44 @@ class VideoPlayer:
             self.logger('error', 'cplayer', 'No source, there is no source, where is my source?!')
             self.stop()
 
+    def seek_to(self, pos):
+        if pos:
+            try:
+                while self.get_player_id() and self.get_video_position() <= 0:
+                    time.sleep(5)
+                if self.mpv_player:
+                    self.mpv_player._set_property(name='time-pos',
+                                                  value=pos, proptype=float)
+            except AttributeError:
+                self.logger('info', 'cplayer', 'The player no longer exists!')
+
     def stop(self):
         try:
             # remove from the treestore
             self.video_players_group.treestore.remove(self.treestore_id_field)
             self.mpv_player.quit()
             self.mpv_player.terminate()
+            # remove from the videoplayers object (the store of existing players)
+            self.video_players_group.remove_player(self.get_player_id())
+            # delete player object
             del self.mpv_player
         except AttributeError:
             print('No player to stop with ID: {}'.format(self.get_player_id()))
 
     def pause(self, paused=False):
-        # pause or resume (according to paused value)
-        self.mpv_player._set_property(name='pause', value=paused)
-        # set state
-        if paused is True:
-            self.set_player_state(self.PAUSED)
-        else:
-            self.set_player_state(self.PLAYING)
-        # update the displayed state
-        self.video_players_group.treestore.set_value(
-            self.treestore_state_field, 1, self.get_player_state())
+        try:
+            # pause or resume (according to paused value)
+            self.mpv_player._set_property(name='pause', value=paused)
+            # set state
+            if paused is True:
+                self.set_player_state(self.PAUSED)
+            else:
+                self.set_player_state(self.PLAYING)
+            # update the displayed state
+            self.video_players_group.treestore.set_value(
+                self.treestore_state_field, 1, self.get_player_state())
+        except AttributeError:
+            self.logger('error', 'cplayer', 'There is no player!')
 
     def seek(self, dir):
         try:
