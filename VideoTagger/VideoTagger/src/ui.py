@@ -376,6 +376,7 @@ class VideoTagger:
             notes_dir = '/'.join(self.notes_file.split('/')[0:-1])  # gets path minus filename
             notes_filename = self.notes_file.split('/')[-1]
             main_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=7)
+            main_container.set_homogeneous(False)
             current_notes_container = Gtk.ScrolledWindow()
             current_notes_container.set_size_request(400, 0)
             # create treestore
@@ -386,14 +387,12 @@ class VideoTagger:
             tv_value_col_header = Gtk.Label()
             tv_value_col_header.show()
             tv_value_col.set_widget(tv_value_col_header)
-            tv_value_col_header.set_tooltip_text('Click to sort by timestamp')
+            # tv_value_col_header.set_tooltip_text()
             # define cell renderer
             tv_value_cell = Gtk.CellRendererText()
             tv_value_cell.set_fixed_size(-1, -1)
             tv_value_col.pack_start(tv_value_cell, expand=True)
             tv_value_col.add_attribute(tv_value_cell, 'text', 0)
-            tv_value_col.set_sort_column_id(0)
-
             # define holding variables
             timestamp_field = None
             note_position_marker = {}
@@ -412,11 +411,8 @@ class VideoTagger:
                         note_position_marker[note_pos] = item_pos
                     if 'Video Title' in item:
                         tv_value_col_header.set_text('Notes For: {}'.format(item['Video Title']))
-            # auto sort by timestamp
-            sorted_ts = Gtk.TreeModelSort(ts)
-            sorted_ts.set_sort_column_id(0, Gtk.SortType.ASCENDING)
             # create treeview (adding the now-sorted treestore)
-            tv = Gtk.TreeView(sorted_ts)
+            tv = Gtk.TreeView(ts)
             # add the columns to the treeview
             tv.append_column(tv_value_col)
             # define treeview properties
@@ -429,42 +425,43 @@ class VideoTagger:
             tv.expand_all()
             # add treeview to the container
             current_notes_container.add(tv)
-            # add to main container
+            # add notes container to main container
             main_container.pack_start(current_notes_container, False, False, 3)
             # add note_textview to main container
-            main_container.set_homogeneous(False)
             main_container.pack_start(self.note_edit_panel, True, True, 3)
             # get ref to dialog's content area
             content_area_box = dialog.get_content_area()
             # add content grid to content area
             content_area_box.pack_start(main_container, True, True, 3)
+            # add view video button to panel
+            # video_button = Gtk.Button('Play Video')
+            # action_area = dialog.get_action_area()
+            # action_area.pack_start(video_button, False, False, 3)
+            # action_area.reorder_child(video_button, 0)
             # show content
             dialog.show_all()
             # run dialog
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                # save the note
                 buffer = self.note_edit_panel.get_buffer()
+                # save the note
                 edited_text = buffer.get_text(*buffer.get_bounds(), False)
                 note_pos = self.selected_note_row
-                item_pos = note_position_marker[note_pos]
-                note_data[note_pos]['Note'][item_pos]['Note'] = edited_text
-                machine.NoteMachine.save_edit(notes_dir=notes_dir,
-                                              notes_filename=notes_filename,
-                                              note_data=note_data)
-                # cleanup
-                self.selected_note_row = None
-                self.notes_file = None
-                buffer.set_text('')
+                if note_pos:
+                    item_pos = note_position_marker[note_pos]
+                    note_data[note_pos]['Note'][item_pos]['Note'] = edited_text
+                    machine.NoteMachine.save_edit(notes_dir=notes_dir,
+                                                  notes_filename=notes_filename,
+                                                  note_data=note_data)
             elif response == Gtk.ResponseType.CANCEL:
-                print('Cancel clicked!')
-                # cleanup
-                self.selected_note_row = None
-                self.note_edit_panel.get_buffer().set_text('')
-                self.notes_file = None
+                pass
+            # cleanup
+            self.selected_note_row = None
+            self.note_edit_panel.get_buffer().set_text('')
+            self.notes_file = None
             # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
             main_container.remove(self.note_edit_panel)
-        dialog.destroy()
+            dialog.destroy()
         if self.selected_video_player_id:
             self.player_interface(action=self.RESUME)
             # gets / sets pause state
@@ -481,7 +478,7 @@ class VideoTagger:
         # get the data to display in the pane from the note_path
         display_data = model.get_value(model.get_iter(note_path), 0)
         # set the selected row param
-        self.selected_note_row = row[0]
+        self.selected_note_row = int(str(row)[0])
         buffer = self.note_edit_panel.get_buffer()
         # set the note text in the edit panel buffer
         buffer.set_text(display_data.strip())

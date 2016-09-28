@@ -225,13 +225,14 @@ class VideoPlayer:
         self.mpv_player.fullscreen = False
         # define whether loops
         self.mpv_player.loop = 'no'
-        # Option access, in general these require the core to reinitialize
-        self.mpv_player['vo'] = 'opengl'
+        # # # Option access, in general these require the core to reinitialize
+        # set player video renderer
+        #self.mpv_player['vo'] = 'opengl'
         # set seek hr-seek
         self.mpv_player._set_property(name='hr-seek', value='no', proptype=str)
         # start with osd on, at level 3
         self.mpv_player._set_property(name='osd-level', value=3, proptype=int)
-        # mute
+        # start mute on/off
         self.mpv_player._set_property(name='mute', value=False, proptype=bool)
 
         # custom key bindings
