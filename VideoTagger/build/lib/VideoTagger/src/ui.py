@@ -28,7 +28,6 @@ class VideoTagger:
     SET_NOTES_DIR = 'Callback to set the player notes directory'
     MAKE_CONFIG_DIR = False  # Unnecessary for now ...
     SEEK_TO = 'Seeks to position in video stream'
-    GET_POSITION = 'Gets current video position in stream'
     READ_EDIT_NOTE = 'Opens note editor'
 
     def __init__(self):
@@ -94,7 +93,6 @@ class VideoTagger:
         self.video_source = self.builder.get_object('video_source')
         # grids
         self.note_dialog_grid = self.builder.get_object('note_dialog_grid')
-        self.mpv_seek_adjustment = self.builder.get_object('mpv_seek_adjustment')
         # menus
         self.about_menu_item = self.builder.get_object('menu_about')
         self.usage_menu_item = self.builder.get_object('menu_usage')
@@ -137,7 +135,7 @@ class VideoTagger:
         # add the treeview to the container
         self.video_player_list_container.pack_start(self.treeview, True, True, 0)
         # get reference to video players group
-        self.video_players = VideoPlayers(treestore=self.treestore, slider=self.mpv_seek_adjustment)
+        self.video_players = VideoPlayers(treestore=self.treestore)
 
         # # # SELECTION REFERENCES
         self.selected_video_player_id = None
@@ -213,7 +211,7 @@ class VideoTagger:
         if button == self.edit_notes_button:
             self.on_edit_notes_clicked()
         if button.get_name() == 'edit_play_button':
-            self.on_edit_play(note_data=note_data)
+            self.on_edit_play(note_data=note_data, button=button)
 
     def on_button_toggled(self, button):
         if button == self.pause_button:
@@ -221,14 +219,6 @@ class VideoTagger:
                 self.player_interface(action=self.PAUSE)
             else:
                 self.player_interface(action=self.RESUME)
-
-    def on_adjustment_changed(self, widget):
-        if widget == self.mpv_seek_adjustment:
-            # seek to slider position if slider moved more than n seconds from current
-            current_pos = self.player_interface(action=self.GET_POSITION)
-            moved_pos = self.mpv_seek_adjustment.get_value()
-            if current_pos and (moved_pos < current_pos - 0.1 or moved_pos > current_pos + 0.1):
-                self.player_interface(action=self.SEEK_TO)
 
     # # # FILE CHOOSER WIDGETS
 
@@ -488,7 +478,7 @@ class VideoTagger:
         # set the note text in the edit panel buffer
         buffer.set_text(display_data.strip())
 
-    def on_edit_play(self, note_data):
+    def on_edit_play(self, note_data, button):
         timestamp = None
         # close existing player, if any
         if self.selected_video_player_id:
@@ -502,6 +492,9 @@ class VideoTagger:
             # start the player at the designated position
             self.player_interface(action=self.PLAY,
                                   start_position=machine.minsec_to_sec(timestamp))
+            # disable the button to prevent multiple clicks whilst player is opening
+            button.set_sensitive(False)
+
 
     # # # SET SELECTED VIDEO PLAYER ID (& PAUSE BUTTON STATE)
 
@@ -579,8 +572,6 @@ class VideoTagger:
                     return player_instance.gen_note()
                 elif action is self.SEEK_TO:
                     pass  # define later as necessary ...
-                elif action is self.GET_POSITION:
-                    return player_instance.get_video_position()
             else:
                 print("It ain't a player!")
         # clear the url field for next one ..

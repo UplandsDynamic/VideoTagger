@@ -44,13 +44,6 @@
       </row>
     </data>
   </object>
-  <object class="GtkAdjustment" id="mpv_seek_adjustment">
-    <property name="upper">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">1</property>
-    <property name="page_size">1</property>
-    <signal name="value-changed" handler="on_adjustment_changed" swapped="no"/>
-  </object>
   <object class="GtkImage" id="note_dir_icon">
     <property name="visible">True</property>
     <property name="can_focus">False</property>

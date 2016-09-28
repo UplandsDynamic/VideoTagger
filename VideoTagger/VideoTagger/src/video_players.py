@@ -5,7 +5,7 @@ import time
 
 
 class VideoPlayers:
-    def __init__(self, treestore=None, slider=None):
+    def __init__(self, treestore=None):
         self.video_players = {}
         # reference to treestore - model containing display text for the states treeview
         self.treestore = treestore
