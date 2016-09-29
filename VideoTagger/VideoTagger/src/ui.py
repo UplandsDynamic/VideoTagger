@@ -9,6 +9,8 @@ from gi.repository import Gtk, Gdk, Pango
 from .video_players import VideoPlayer, VideoPlayers
 from . import machine
 from VideoTagger.__init__ import PROJECT_ROOT
+import time
+import _thread
 
 
 class VideoTagger:
@@ -29,6 +31,7 @@ class VideoTagger:
     MAKE_CONFIG_DIR = False  # Unnecessary for now ...
     SEEK_TO = 'Seeks to position in video stream'
     READ_EDIT_NOTE = 'Opens note editor'
+    GET_VIDEO_POS = 'Returns current position of video, in seconds'
 
     def __init__(self):
 
@@ -143,12 +146,13 @@ class VideoTagger:
         self.notes_file = None
         self.selected_note_row = None
 
-        # # # NOTE EDIT DIALOG TEXTVIEW
+        # # # NOTE EDIT DIALOG
         self.note_edit_panel = Gtk.TextView()
         self.note_edit_panel.set_left_margin(7)
         self.note_edit_panel.set_right_margin(7)
         self.note_edit_panel.set_top_margin(7)
         self.note_edit_panel.set_bottom_margin(7)
+        self.main_edit_notes_container = None
 
         # # # # # # # SHOW THE MAIN WINDOW
         print('Showing window ...')
@@ -189,7 +193,7 @@ class VideoTagger:
 
     # # # BUTTONS
 
-    def on_button_clicked(self, button, note_data=None):
+    def on_button_clicked(self, button, note_data=None, diaolog=None):
         if button == self.start_button:
             self.player_interface(action=self.PLAY)
         if button == self.stop_button:
@@ -211,7 +215,9 @@ class VideoTagger:
         if button == self.edit_notes_button:
             self.on_edit_notes_clicked()
         if button.get_name() == 'edit_play_button':
-            self.on_edit_play(note_data=note_data, button=button)
+            self.on_edit_play(note_data=note_data,
+                              button=button,
+                              dialog=diaolog)
 
     def on_button_toggled(self, button):
         if button == self.pause_button:
@@ -367,8 +373,8 @@ class VideoTagger:
             note_data = machine.NoteMachine.edit_notes(notes_file=self.notes_file)
             notes_dir = '/'.join(self.notes_file.split('/')[0:-1])  # gets path minus filename
             notes_filename = self.notes_file.split('/')[-1]
-            main_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=7)
-            main_container.set_homogeneous(False)
+            self.main_edit_notes_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=7)
+            self.main_edit_notes_container.set_homogeneous(False)
             current_notes_container = Gtk.ScrolledWindow()
             current_notes_container.set_size_request(400, 0)
             # create treestore
@@ -418,13 +424,13 @@ class VideoTagger:
             # add treeview to the container
             current_notes_container.add(tv)
             # add notes container to main container
-            main_container.pack_start(current_notes_container, False, False, 3)
+            self.main_edit_notes_container.pack_start(current_notes_container, False, False, 3)
             # add note_textview to main container
-            main_container.pack_start(self.note_edit_panel, True, True, 3)
+            self.main_edit_notes_container.pack_start(self.note_edit_panel, True, True, 3)
             # get ref to dialog's content area
             content_area_box = dialog.get_content_area()
             # add content grid to content area
-            content_area_box.pack_start(main_container, True, True, 3)
+            content_area_box.pack_start(self.main_edit_notes_container, True, True, 3)
             # add view video button to panel
             video_button = Gtk.Button('Play Video')
             video_button.set_name('edit_play_button')
@@ -432,7 +438,7 @@ class VideoTagger:
             action_area.pack_start(video_button, False, False, 3)
             action_area.reorder_child(video_button, 0)
             # add video view button action
-            video_button.connect('clicked', self.on_button_clicked, note_data)
+            video_button.connect('clicked', self.on_button_clicked, note_data, dialog)
             # show content
             dialog.show_all()
             # run dialog
@@ -450,17 +456,31 @@ class VideoTagger:
                                                   note_data=note_data)
             elif response == Gtk.ResponseType.CANCEL:
                 pass
-            # cleanup
-            self.selected_note_row = None
-            self.note_edit_panel.get_buffer().set_text('')
-            self.notes_file = None
-            # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
-            main_container.remove(self.note_edit_panel)
-            dialog.destroy()
+            # cleanup and destroy
+            self.note_edit_dialog_destroy(dialog)
         if self.selected_video_player_id:
             self.player_interface(action=self.RESUME)
             # gets / sets pause state
             self.player_interface(self.GET_PAUSE_BUTTON_STATE)
+
+    def note_edit_dialog_destroy(self, dialog):
+        counter = 0
+        while self.selected_video_player_id and \
+                        self.player_interface(action=self.GET_VIDEO_POS) <= 0:
+                if counter < 16:
+                    time.sleep(1)
+                    counter += 1
+                else:
+                    # break out & cancel start if video hasn't started in 15 secs
+                    self.player_interface(action=self.STOP)
+                    break
+        # cleanup
+        self.selected_note_row = None
+        self.note_edit_panel.get_buffer().set_text('')
+        self.notes_file = None
+        # cleanup (remove inst var from box to stop it being destroyed with dialog (causing crash)
+        self.main_edit_notes_container.remove(self.note_edit_panel)
+        dialog.destroy()
 
     def on_note_tv_activated(self, widget, row, col):
         # opens an edit dialog
@@ -478,8 +498,9 @@ class VideoTagger:
         # set the note text in the edit panel buffer
         buffer.set_text(display_data.strip())
 
-    def on_edit_play(self, note_data, button):
+    def on_edit_play(self, button, **kwargs):
         timestamp = None
+        note_data = kwargs.get('note_data')
         # close existing player, if any
         if self.selected_video_player_id:
             self.player_interface(action=self.STOP)
@@ -494,7 +515,8 @@ class VideoTagger:
                                   start_position=machine.minsec_to_sec(timestamp))
             # disable the button to prevent multiple clicks whilst player is opening
             button.set_sensitive(False)
-
+            # when playing, close dialog
+            self.note_edit_dialog_destroy(dialog=kwargs.get('dialog'))
 
     # # # SET SELECTED VIDEO PLAYER ID (& PAUSE BUTTON STATE)
 
@@ -572,6 +594,8 @@ class VideoTagger:
                     return player_instance.gen_note()
                 elif action is self.SEEK_TO:
                     pass  # define later as necessary ...
+                elif action is self.GET_VIDEO_POS:
+                    return player_instance.get_video_position()
             else:
                 print("It ain't a player!")
         # clear the url field for next one ..

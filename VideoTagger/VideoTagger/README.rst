@@ -29,6 +29,8 @@ readable and editable.
 
 - Take timestamped notes at any point in a video at the tap of a button.
 - Run, control and note-take on video streams.
+- Read and edit existing notes from the application.
+- Start video from a note's timestamp at the click of a button.
 
 ---------
 **Usage**

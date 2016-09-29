@@ -4,10 +4,8 @@ VIDEOTAGGER APPLICATION LICENSE & INFORMATION
 THIS COPYRIGHT NOTICE MUST BE RETAINED AND DISTRIBUTED WITH ANY
 REDISTRIBUTION OF THIS SOFTWARE.
 
-Code author: Dan Bright
-Code author email: dan@aninstanceofme.com
-Code author website: https://www.zaziork.com
-Code first published (on 09 Sept 2016) at: https://github.com/ZWS2014/VideoTagger
+Software author(s): Dan Bright ( dan@aninstanceofme.com | https://www.zaziork.com )
+Software first published on 09 Sept 2016 at: https://github.com/ZWS2014/VideoTagger
 
 This software is released under the GNU GENERAL PUBLIC LICENSE,
 VERSION 3 (as presented below).
