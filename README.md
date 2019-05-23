@@ -1,6 +1,6 @@
 # VideoTagger Application
 
-__NOTE: This project is now unmaintained. It should NOT be used without first upgrading the dependencies to the lastest versions, in order to patch security vulnerabilities.__
+__NOTE: This project is now unmaintained and therefore should *NOT* be used in production. It is likely to contain security vulnerabilites, both in the codebase and project dependences.__
 
 Full README, with usage instructions, available in the README.rst, here:
 
